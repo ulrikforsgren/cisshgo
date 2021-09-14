@@ -4,7 +4,7 @@ github.com/anmitsu/go-shlex
 # github.com/gliderlabs/ssh v0.3.0
 ## explicit
 github.com/gliderlabs/ssh
-# golang.org/x/crypto v0.0.0-20200820211705-5c72a883971a
+# golang.org/x/crypto v0.0.0-20210817164053-32db794688a5
 ## explicit
 golang.org/x/crypto/blowfish
 golang.org/x/crypto/chacha20
