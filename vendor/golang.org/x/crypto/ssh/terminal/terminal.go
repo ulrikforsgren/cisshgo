@@ -105,7 +105,7 @@ func NewTerminal(c io.ReadWriter, prompt string) *Terminal {
 		Escape:       &vt100EscapeCodes,
 		c:            c,
 		prompt:       []rune(prompt),
-		termWidth:    80,
+		termWidth:    511,
 		termHeight:   24,
 		echo:         true,
 		historyIndex: -1,

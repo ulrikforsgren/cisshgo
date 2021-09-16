@@ -1,0 +1,5 @@
+                                                                                      EXPORTED  EXPORTED
+NAME                    REVISION    NAMESPACE                           PREFIX        TO ALL    TO
+----------------------------------------------------------------------------------------------------------
+tailf-ned-cisco-ios-xr  2020-11-25  http://tail-f.com/ned/cisco-ios-xr  cisco-ios-xr  X         -
+

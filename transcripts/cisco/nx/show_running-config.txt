@@ -1,0 +1,38 @@
+no feature telnet
+fex 101
+ pinning max-links 1
+!
+fex 102
+ pinning max-links 1
+!
+vlan 1,380,400
+!
+no system auto-upgrade epld
+interface port-channel100
+ no shutdown
+ switchport mode trunk
+ spanning-tree port type network
+exit
+interface port-channel73
+ no shutdown
+ switchport mode trunk
+ switchport trunk allowed vlan 1,380,400
+ spanning-tree port type network
+exit
+interface Ethernet1/1
+ switchport
+ channel-group 73 mode active
+ no shutdown
+ description e1/1
+ switchport mode trunk
+ switchport trunk allowed vlan 1,380,400
+exit
+interface Ethernet101/1/1
+ switchport
+ no shutdown
+ switchport access vlan 401
+ spanning-tree port type edge
+exit
+no logging monitor
+no logging module
+no logging console

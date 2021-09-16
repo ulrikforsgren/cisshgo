@@ -1,6 +1,14 @@
-FROM golang:1.15.0-buster
+FROM golang:1.17.1-alpine as build
 ADD . /app
 WORKDIR /app
 ENV GO111MODULE=on
 RUN go mod download
-CMD go run cissh.go
+RUN go build -o /app/cisshgo cissh.go
+
+
+FROM alpine as nx
+RUN mkdir /app
+COPY --from=build /app/cisshgo /app/cisshgo
+COPY /transcripts /app/transcripts
+WORKDIR /app
+ENTRYPOINT ["/app/cisshgo"]
