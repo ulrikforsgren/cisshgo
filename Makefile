@@ -1,4 +1,7 @@
-cisshgo:
+.PHONY: all
+all: cisshgo
+
+cisshgo: cissh.go
 	go build
 
 .PHONY: update-go-deps
