@@ -24,8 +24,10 @@ type TranscriptMap struct {
 }
 
 // ParseArgs parses command line arguments for cisshgo
-func ParseArgs() (int, *int, TranscriptMap) {
+func ParseArgs() (*string, *string, int, *int, TranscriptMap) {
 	// Gather command line arguments and parse them
+	vendor := flag.String("vendor", "cisco", "Device vendor")
+	platform := flag.String("platform", "csr1000v", "Device platform")
 	listenersPtr := flag.Int("listeners", 50, "How many listeners do you wish to spawn?")
 	startingPortPtr := flag.Int("startingPort", 10000, "What port do you want to start at?")
 	transcriptMapPtr := flag.String(
@@ -52,5 +54,5 @@ func ParseArgs() (int, *int, TranscriptMap) {
 	}
 	// fmt.Printf("YAML Parsed Transcript Map:\n\n%+v\n", myTranscriptMap)
 
-	return numListeners, startingPortPtr, myTranscriptMap
+	return vendor, platform, numListeners, startingPortPtr, myTranscriptMap
 }
