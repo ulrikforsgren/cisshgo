@@ -34,7 +34,7 @@ func CmdMatch(userInput string, supportedCommands map[string]string) (bool, stri
 		// Match against the 1st field in each command,
 		// and that the number of fields is the same,
 		// to find any possibleMatches.
-		if strings.Contains(commandFields[0], userInputFields[0]) &&
+		if (strings.Index(commandFields[0], userInputFields[0]) == 0) &&
 			(len(commandFields) == len(userInputFields)) {
 			// fmt.Printf("supportedCommand: %s\n", k)
 			possibleMatches[supportedCommand] = commandFields
@@ -55,7 +55,7 @@ func CmdMatch(userInput string, supportedCommands map[string]string) (bool, stri
 		}
 
 		// Next, test if the entire input is contained within one of our commands
-		if strings.Contains(possibleMatch, userInput) {
+		if strings.Index(possibleMatch, userInput) == 0 {
 			closestMatch[possibleMatch] = struct{}{}
 			break
 		}
@@ -63,7 +63,7 @@ func CmdMatch(userInput string, supportedCommands map[string]string) (bool, stri
 		// Next delve into the fields and find best match
 		for p, possibleMatchField := range possibleMatches[possibleMatch] {
 			// fmt.Printf("possibleMatchField: %s\n", possibleMatchField)
-			if !strings.Contains(possibleMatchField, userInputFields[p]) {
+			if strings.Index(possibleMatchField, userInputFields[p]) == -1 {
 				// We did not get a match on this field, break
 				break
 			}
