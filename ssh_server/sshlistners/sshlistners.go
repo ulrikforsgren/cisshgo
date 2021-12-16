@@ -37,6 +37,7 @@ func GenericListener(
 					return pass == myFakeDevice.Password
 				}, // Handle SSH authentication with the provided password
 			), // Additional ssh.Options, in this case Password handling
+			ssh.HostKeyFile("id_rsa"),
 		),
 	)
 
