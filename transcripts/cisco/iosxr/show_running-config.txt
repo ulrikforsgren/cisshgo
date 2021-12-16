@@ -1,0 +1,51 @@
+admin
+ exit-admin-config
+!
+interface FastEthernet 0/0/0/0
+ no shutdown
+exit
+interface FastEthernet 0/0/0/1
+ no shutdown
+exit
+interface FastEthernet 0/0/0/2
+ no shutdown
+exit
+interface FastEthernet 0/0/0/3
+ no shutdown
+exit
+interface FastEthernet 0/0/0/4
+ no shutdown
+exit
+interface FastEthernet 0/0/0/5
+ no shutdown
+exit
+interface FastEthernet 0/0/0/6
+ no shutdown
+exit
+interface FastEthernet 0/0/0/7
+ no shutdown
+exit
+interface FastEthernet 0/1/0/0
+ no shutdown
+exit
+interface FastEthernet 0/1/0/1
+ no shutdown
+exit
+interface FastEthernet 0/1/0/2
+ no shutdown
+exit
+interface FastEthernet 0/1/0/3
+ no shutdown
+exit
+interface FastEthernet 0/1/0/4
+ no shutdown
+exit
+interface FastEthernet 0/1/0/5
+ no shutdown
+exit
+interface FastEthernet 0/1/0/6
+ no shutdown
+exit
+interface FastEthernet 0/1/0/7
+ no shutdown
+exit

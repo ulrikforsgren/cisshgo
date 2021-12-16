@@ -19,3 +19,40 @@ platforms:
         "configure terminal": "(config)#"
         "enable": "#"
         "base": ">"
+  - iosxr:
+      vendor: "cisco"
+      hostname: "cisshgoiosxr"
+      password: "admin"
+      command_transcripts:
+        "show running-config": "transcripts/cisco/iosxr/show_running-config.txt"
+        "show version": "transcripts/cisco/iosxr/show_version_brief.txt"
+        "show version brief": "transcripts/cisco/iosxr/show_version_brief.txt"
+        "show confd-state version": "transcripts/cisco/iosxr/show_confd-state_version.txt"
+        "show confd-state loaded-data-models data-model tailf-ned-cisco-ios-xr": "transcripts/cisco/iosxr/show_confd-state_loaded-data-models_data-model_tailf-ned-cisco-ios-xr.txt"
+        "terminal length 0": "transcripts/generic_empty_return.txt"
+        "terminal width 0": "transcripts/generic_empty_return.txt"
+      context_hierarchy:
+        "(config)#": "#"
+        "#": "exit"
+      context_search:
+        "config terminal": "(config)#"
+        "base": "#"
+  - nx:
+      vendor: "cisco"
+      hostname: "cisshgonx"
+      password: "admin"
+      command_transcripts:
+        "show running-config": "transcripts/cisco/nx/show_running-config.txt"
+        "show version": "transcripts/cisco/nx/show_version.txt"
+        "terminal length 0": "transcripts/generic_empty_return.txt"
+        "terminal width 511": "transcripts/generic_empty_return.txt"
+        "terminal length 0 ; terminal width 511 ; show version ; show inventory": "transcripts/cisco/nx/show_version_inventory.txt"
+        "write mem": "transcripts/generic_empty_return.txt"
+      context_hierarchy:
+        "(config)#": "#"
+        "#": ">"
+        ">": "exit"
+      context_search:
+        "configure terminal": "(config)#"
+        "enable": "#"
+        "base": ">"

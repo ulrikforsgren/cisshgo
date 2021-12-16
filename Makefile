@@ -1,4 +1,22 @@
-cisshgo:
+VER=0.1
+CONTAINER="containers.cisco.com/uforsgre/cisshgo"
+
+.PHONY: all
+all: cisshgo
+
+.PHONY: all
+all: image
+
+.PHONY: image
+image:
+	docker rmi --force $(CONTAINER):$(VER)
+	$(MAKE) cisshgo
+	docker build -t $(CONTAINER):$(VER) .
+
+push-image:
+	docker push $(CONTAINER):$(VER)
+
+cisshgo: cissh.go
 	go build
 
 .PHONY: update-go-deps

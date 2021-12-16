@@ -19,6 +19,8 @@ func GenericCiscoHandler(myFakeDevice *fakedevices.FakeDevice) {
 	// Prepare the "ssh.DefaultHandler", this houses our device specific functionality
 	ssh.Handle(func(s ssh.Session) {
 
+		log.Printf("%s: terminal connected\n", s.LocalAddr())
+
 		// Setup our initial "context" or prompt
 		ContextState := myFakeDevice.ContextSearch["base"]
 
@@ -31,7 +33,7 @@ func GenericCiscoHandler(myFakeDevice *fakedevices.FakeDevice) {
 			if err != nil {
 				break
 			}
-			log.Println(userInput)
+		    log.Printf("%s: %v\n", s.LocalAddr(), userInput)
 
 			// Handle any empty input (assumed to just be a carriage return)
 			if userInput == "" {
@@ -120,7 +122,7 @@ func GenericCiscoHandler(myFakeDevice *fakedevices.FakeDevice) {
 				continue
 			}
 		}
-		log.Println("terminal closed")
+		log.Printf("%s: terminal closed\n", s.LocalAddr())
 
 	})
 }
