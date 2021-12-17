@@ -2,6 +2,7 @@ package utils
 
 import (
 	"fmt"
+    "regexp"
 	"strings"
 )
 
@@ -97,4 +98,60 @@ func CmdMatch(userInput string, supportedCommands map[string]string) (bool, stri
 
 	// fmt.Printf("matchedCmd: %s\n\n", matchedCmd)
 	return match, matchedCmd, multipleMatches, nil
+}
+
+
+
+// ContextMatch searches the provided supportedContexts to find a match for the provided userInput
+// Returns:
+//	match: bool
+// 	matchedCommand: string
+//	error
+func ContextMatch(userInput string, supportedContexts map[string]string) (bool, string, bool, error) {
+
+	// Setup our return variables
+	match := false
+    matchedContext := ""
+
+	// Turn our input string into fields
+	// fmt.Printf("userInput: %s\n", userInput)
+	userInput = strings.ToLower(userInput) // Lowercase the user input
+	userInputFields := strings.Fields(userInput)
+
+	// Iterate through all the commands in the supportedContexts map and create
+    // regexp.
+	for supportedContext := range supportedContexts {
+		contextFields := strings.Fields(strings.ToLower(supportedContext))
+
+        if len(userInputFields) == len(contextFields) {
+	        match = true
+            for n,f := range contextFields {
+                // Compilation of regexps should be done one time at startup!
+                r := regexp.MustCompile("^"+f+"$")
+                if r.MatchString(userInputFields[n]) == false {
+                    match = false
+                    break
+                }
+            }
+            if match {
+                matchedContext = supportedContext
+                break
+            }
+        }
+	}
+
+	return match, matchedContext, false, nil
+}
+
+func CompileMatches(supportedContexts map[string]string) (map[string][]interface{}, error) {
+    fieldsMap := make(map[string][]interface{})
+
+	for supportedContext := range supportedContexts {
+		fields := strings.Fields(strings.ToLower(supportedContext))
+        for n,f := range fields {
+            fmt.Println(n, ":", f)
+        }
+	}
+
+    return fieldsMap, nil
 }

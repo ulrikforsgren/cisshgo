@@ -15,7 +15,6 @@ platforms:
         "no shutdown": "transcripts/empty.txt"
         "no switchport": "transcripts/empty.txt"
         "ip address dhcp": "transcripts/empty.txt"
-        "interface ethernet0/0": "transcripts/empty.txt"
         "description The Internet": "transcripts/empty.txt"
       context_hierarchy:
         "(config-if)#": "(config)#"
@@ -23,8 +22,9 @@ platforms:
         "#": ">"
         ">": "exit"
       context_search:
-        "interface ethernet0/0": "(config-if)#"
+        "interface Ethernet[0-9]+/[0-9]+": "(config-if)#"
         "configure terminal": "(config)#"
+        "config t": "(config)#"
         "enable": "#"
         "base": ">"
   - iosxr:

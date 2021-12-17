@@ -43,7 +43,7 @@ func GenericCiscoHandler(myFakeDevice *fakedevices.FakeDevice) {
 			}
 
 			// Run userInput through the command matcher to look for contextSwitching commands
-			matchPrompt, matchedPrompt, multiplePromptMatches, err := utils.CmdMatch(
+			matchPrompt, matchedPrompt, multiplePromptMatches, err := utils.ContextMatch(
 				userInput, myFakeDevice.ContextSearch,
 			)
 			if err != nil {

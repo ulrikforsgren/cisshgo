@@ -28,6 +28,8 @@ func TestCmdMatch(t *testing.T) {
 	inputs["no version"] = inputMatch{false, "", false}                   // Should return no match
 	inputs["Sho vLan BrIef"] = inputMatch{true, "show vlan brief", false} // Should match "show vlan brief"
 	inputs["show vlan!"] = inputMatch{false, "", false}                   // Should return no match
+	inputs["how ersion"] = inputMatch{false, "", false}                   // Should return no match
+	inputs["ho ersio"] = inputMatch{false, "", false}                     // Should return no match
 
 	for input, expected := range inputs {
 		match, matchedCommand, multipleMatches, err := CmdMatch(input, mySupportedCommands)
