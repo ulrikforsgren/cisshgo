@@ -3,6 +3,7 @@
 package handlers
 
 import (
+//    "fmt"
 	"log"
 	"strings"
 
@@ -41,16 +42,14 @@ func GenericCiscoHandler(myFakeDevice *fakedevices.FakeDevice) {
 				term.Write([]byte(""))
 				continue
 			}
-
 			// Run userInput through the command matcher to look for contextSwitching commands
 			matchPrompt, matchedPrompt, multiplePromptMatches, err := utils.ContextMatch(
-				userInput, myFakeDevice.ContextSearch,
+				userInput, myFakeDevice.CompContextSearch,
 			)
 			if err != nil {
 				log.Println(err)
 				break
 			}
-
 			// Handle any context switching
 			if matchPrompt && !multiplePromptMatches {
 				// switch contexts as needed
@@ -93,7 +92,8 @@ func GenericCiscoHandler(myFakeDevice *fakedevices.FakeDevice) {
 			}
 
 			// Run userInput through the command matcher to look at supportedCommands
-			match, matchedCommand, multipleMatches, err := utils.CmdMatch(userInput, myFakeDevice.SupportedCommands)
+			//match, matchedCommand, multipleMatches, err := utils.CmdMatch(userInput, myFakeDevice.SupportedCommands)
+			match, matchedCommand, multipleMatches, err := utils.ContextMatch(userInput, myFakeDevice.CompiledSupportedCommands)
 			if err != nil {
 				log.Println(err)
 				break

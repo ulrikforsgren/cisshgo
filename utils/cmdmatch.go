@@ -35,7 +35,7 @@ func CmdMatch(userInput string, supportedCommands map[string]string) (bool, stri
 		// Match against the 1st field in each command,
 		// and that the number of fields is the same,
 		// to find any possibleMatches.
-		if (strings.Index(commandFields[0], userInputFields[0]) == 0) &&
+		if strings.HasPrefix(commandFields[0], userInputFields[0]) &&
 			(len(commandFields) == len(userInputFields)) {
 			// fmt.Printf("supportedCommand: %s\n", k)
 			possibleMatches[supportedCommand] = commandFields
@@ -56,7 +56,7 @@ func CmdMatch(userInput string, supportedCommands map[string]string) (bool, stri
 		}
 
 		// Next, test if the entire input is contained within one of our commands
-		if strings.Index(possibleMatch, userInput) == 0 {
+		if strings.HasPrefix(possibleMatch, userInput) {
 			closestMatch[possibleMatch] = struct{}{}
 			break
 		}
@@ -64,7 +64,7 @@ func CmdMatch(userInput string, supportedCommands map[string]string) (bool, stri
 		// Next delve into the fields and find best match
 		for p, possibleMatchField := range possibleMatches[possibleMatch] {
 			// fmt.Printf("possibleMatchField: %s\n", possibleMatchField)
-			if strings.Index(possibleMatchField, userInputFields[p]) == -1 {
+			if !strings.HasPrefix(possibleMatchField, userInputFields[p]) {
 				// We did not get a match on this field, break
 				break
 			}
@@ -107,7 +107,7 @@ func CmdMatch(userInput string, supportedCommands map[string]string) (bool, stri
 //	match: bool
 // 	matchedCommand: string
 //	error
-func ContextMatch(userInput string, supportedContexts map[string]string) (bool, string, bool, error) {
+func ContextMatch1(userInput string, supportedContexts map[string]string) (bool, string, bool, error) {
 
 	// Setup our return variables
 	match := false
@@ -143,15 +143,72 @@ func ContextMatch(userInput string, supportedContexts map[string]string) (bool, 
 	return match, matchedContext, false, nil
 }
 
-func CompileMatches(supportedContexts map[string]string) (map[string][]interface{}, error) {
-    fieldsMap := make(map[string][]interface{})
 
-	for supportedContext := range supportedContexts {
-		fields := strings.Fields(strings.ToLower(supportedContext))
-        for n,f := range fields {
-            fmt.Println(n, ":", f)
+
+// ContextMatch searches the provided supportedContexts to find a match for the provided userInput
+// Returns:
+//	match: bool
+// 	matchedCommand: string
+//	error
+func ContextMatch(userInput string, supportedContexts *MatchContexts) (bool, string, bool, error) {
+
+	// Setup our return variables
+	match := false
+    matchedContext := ""
+
+	// Turn our input string into fields
+	// fmt.Printf("userInput: %s\n", userInput)
+	userInput = strings.ToLower(userInput) // Lowercase the user input
+	userInputFields := strings.Fields(userInput)
+
+	// Iterate through all the commands in the supportedContexts map and create
+    // regexp.
+	for supportedContext, contextFields := range *supportedContexts {
+        if len(userInputFields) == len(contextFields) {
+	        match = true
+            fieldsLoop: for n,f := range contextFields {
+                switch f.(type) {
+                case string:
+                   // fmt.Println("COMP string", f, userInputFields[n])
+                    if !strings.HasPrefix(f.(string), userInputFields[n]) {
+                        match = false
+                        break fieldsLoop
+                    }
+                    //fmt.Println("MATCH!")
+                default: // *regexp.Regexp
+                    if f.(*regexp.Regexp).MatchString(userInputFields[n]) == false {
+                        match = false
+                        break fieldsLoop
+                    }
+                }
+            }
+            if match {
+                matchedContext = supportedContext
+                break
+            }
         }
 	}
 
-    return fieldsMap, nil
+	return match, matchedContext, false, nil
+}
+
+type MatchContexts map[string][]interface{}
+
+func CompileMatches(supportedContexts map[string]string) (*MatchContexts, error) {
+    fieldsMap := make(MatchContexts)
+
+	for ctx := range supportedContexts {
+        fields := strings.Fields(strings.ToLower(ctx))
+        comp_fields := make([]interface{}, len(fields))
+        for n,f := range fields {
+            if  strings.HasPrefix(f, "<r>") {
+                comp_fields[n] =regexp.MustCompile("^"+f[3:]+"$")
+            } else {
+                comp_fields[n] = f
+            }
+        }
+        fieldsMap[ctx] = comp_fields
+	}
+
+    return &fieldsMap, nil
 }

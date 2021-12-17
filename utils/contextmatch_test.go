@@ -13,20 +13,21 @@ func TestContextMatch(t *testing.T) {
 	// Create a fake SupportedCommands map
 	mySupportedContexts := map[string]string{
 		"interface Ethernet":  "Interface Ethernet sub mode",
-		"interface Ethernet[0-9]+/[0-9]+":  "Interface Ethernet sub mode",
+		"interface <R>Ethernet[0-9]+/[0-9]+":  "Interface Ethernet sub mode",
 	}
 
-    CompileMatches(mySupportedContexts)
+    compiledContexts, _ := CompileMatches(mySupportedContexts)
 	inputs := make(map[string]contextMatch)
 
 	inputs["interface ethernet"] = contextMatch{true, "interface Ethernet", false} // Should match "show version"
-	inputs["interface ethernet0/0"] = contextMatch{true, "interface Ethernet[0-9]+/[0-9]+", false} // Should match "show version"
-	inputs["interface ethernet100/100"] = contextMatch{true, "interface Ethernet[0-9]+/[0-9]+", false} // Should match "show version"
+	inputs["int ethe"] = contextMatch{true, "interface Ethernet", false} // Should match "show version"
+	inputs["interface ethernet0/0"] = contextMatch{true, "interface <R>Ethernet[0-9]+/[0-9]+", false} // Should match "show version"
+	inputs["interface ethernet100/100"] = contextMatch{true, "interface <R>Ethernet[0-9]+/[0-9]+", false} // Should match "show version"
 	inputs["s v"] = contextMatch{false, "", false}                            // Should return no match
     inputs["show version made-up"] = contextMatch{false, "", false}         // Should return no match
 
 	for input, expected := range inputs {
-		match, matchedCommand, multipleMatches, err := ContextMatch(input, mySupportedContexts)
+		match, matchedCommand, multipleMatches, err := ContextMatch(input, compiledContexts)
 		if err != nil {
 			t.Errorf("Unknown Error: %s", err)
 		}

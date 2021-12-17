@@ -18,7 +18,9 @@ type FakeDevice struct {
 	DefaultHostname   string            // Default Hostname of the fake device (for resetting)
 	Password          string            // Password of the fake device
 	SupportedCommands SupportedCommands // What commands this fake device supports
+	CompiledSupportedCommands *utils.MatchContexts
 	ContextSearch     map[string]string // The available CLI prompt/contexts on this fake device
+	CompContextSearch *utils.MatchContexts // The available CLI prompt/contexts on this fake device
 	ContextHierarchy  map[string]string // The hierarchy of the available contexts
 }
 
@@ -66,6 +68,9 @@ func InitGeneric(
 		supportedCommands[k] = readFile(v)
 	}
 
+    compiledContextSearch, _ := utils.CompileMatches(contextSearch)
+    compiledSupportedCommands, _ := utils.CompileMatches(supportedCommands)
+
 	// Create our fake device and return it
 	myFakeDevice := FakeDevice{
 		Vendor:            vendor,
@@ -74,7 +79,9 @@ func InitGeneric(
 		DefaultHostname:   deviceHostname,
 		Password:          devicePassword,
 		SupportedCommands: supportedCommands,
+		CompiledSupportedCommands: compiledSupportedCommands,
 		ContextSearch:     contextSearch,
+		CompContextSearch: compiledContextSearch,
 		ContextHierarchy:  contextHierarchy,
 	}
 
