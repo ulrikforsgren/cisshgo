@@ -117,8 +117,10 @@ func GenericCiscoHandler(myFakeDevice *fakedevices.FakeDevice) {
 				term.Write(append([]byte("% Ambiguous command:  \""+userInput+"\""), '\n'))
 				continue
 			} else {
-				// If all else fails, we did not recognize the input!
-				term.Write(append([]byte("% Unknown command:  \""+userInput+"\""), '\n'))
+                if !strings.HasPrefix(ContextState, "(config") {
+				    // If all else fails, we did not recognize the input!
+				    term.Write(append([]byte("% Unknown command:  \""+userInput+"\""), '\n'))
+                }
 				continue
 			}
 		}
