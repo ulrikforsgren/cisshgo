@@ -1,6 +1,7 @@
 package fakedevices
 
 import (
+//    "fmt"
 	"io/ioutil"
 	"log"
 
@@ -8,7 +9,7 @@ import (
 )
 
 // SupportedCommands is a map of the commands a FakeDevice supports and it's corresponding output
-type SupportedCommands map[string]string
+//type SupportedCommands map[string]string
 
 // FakeDevice Struct for the device we will be simulating
 type FakeDevice struct {
@@ -17,11 +18,9 @@ type FakeDevice struct {
 	Hostname          string            // Hostname of the fake device
 	DefaultHostname   string            // Default Hostname of the fake device (for resetting)
 	Password          string            // Password of the fake device
-	SupportedCommands SupportedCommands // What commands this fake device supports
-	CompiledSupportedCommands *utils.MatchContexts
-	ContextSearch     map[string]string // The available CLI prompt/contexts on this fake device
-	CompContextSearch *utils.MatchContexts // The available CLI prompt/contexts on this fake device
-	ContextHierarchy  map[string]string // The hierarchy of the available contexts
+	SupportedCommands *utils.MatchCommands // What commands this fake device supports
+	ContextSearch     *utils.MatchContexts // The available CLI prompt/contexts on this fake device
+	ContextHierarchy  map[uint]*utils.TranscriptMapContext // The hierarchy of the available contexts
 }
 
 // readFile abstracts the standard error handling of opening and reading a file into a string
@@ -37,12 +36,12 @@ func readFile(filename string) string {
 func InitGeneric(
 	vendor string,
 	platform string,
-	myTranscriptMap utils.TranscriptMap,
+	myTranscriptMap *utils.TranscriptMap,
+    contextHierarchy map[uint]*utils.TranscriptMapContext,
 ) *FakeDevice {
 
 	supportedCommands := make(map[string]string)
-	contextSearch := make(map[string]string)
-	contextHierarchy := make(map[string]string)
+	contextSearch := make(map[string]*utils.TranscriptMapContext)
 	commandTranscriptFiles := make(map[string]string)
 
 	// Find the hostname, password, and other info in the data for this device
@@ -57,7 +56,6 @@ func InitGeneric(
 				deviceHostname = v.Hostname
 				devicePassword = v.Password
 				contextSearch = v.ContextSearch
-				contextHierarchy = v.ContextHierarchy
 				commandTranscriptFiles = v.CommandTranscripts
 			}
 		}
@@ -68,8 +66,8 @@ func InitGeneric(
 		supportedCommands[k] = readFile(v)
 	}
 
+    compiledSupportedCommands, _ := utils.CompileCommands(supportedCommands)
     compiledContextSearch, _ := utils.CompileMatches(contextSearch)
-    compiledSupportedCommands, _ := utils.CompileMatches(supportedCommands)
 
 	// Create our fake device and return it
 	myFakeDevice := FakeDevice{
@@ -78,10 +76,8 @@ func InitGeneric(
 		Hostname:          deviceHostname,
 		DefaultHostname:   deviceHostname,
 		Password:          devicePassword,
-		SupportedCommands: supportedCommands,
-		CompiledSupportedCommands: compiledSupportedCommands,
-		ContextSearch:     contextSearch,
-		CompContextSearch: compiledContextSearch,
+		SupportedCommands: compiledSupportedCommands,
+		ContextSearch: compiledContextSearch,
 		ContextHierarchy:  contextHierarchy,
 	}
 

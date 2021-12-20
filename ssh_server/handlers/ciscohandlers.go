@@ -3,7 +3,7 @@
 package handlers
 
 import (
-//    "fmt"
+    "fmt"
 	"log"
 	"strings"
 
@@ -23,10 +23,12 @@ func GenericCiscoHandler(myFakeDevice *fakedevices.FakeDevice) {
 		log.Printf("%s: terminal connected\n", s.LocalAddr())
 
 		// Setup our initial "context" or prompt
-		ContextState := myFakeDevice.ContextSearch["base"]
+		ContextState := myFakeDevice.ContextHierarchy[1] // base
+		fmt.Println(myFakeDevice.ContextHierarchy)
 
 		// Setup a terminal with the hostname + initial context state as a prompt
-		term := terminal.NewTerminal(s, myFakeDevice.Hostname+ContextState)
+        fmt.Println("ContextState:", ContextState)
+		term := terminal.NewTerminal(s, myFakeDevice.Hostname+ContextState.Mode)
 
 		// Iterate over any user input that is provided at the terminal
 		for {
@@ -44,7 +46,7 @@ func GenericCiscoHandler(myFakeDevice *fakedevices.FakeDevice) {
 			}
 			// Run userInput through the command matcher to look for contextSwitching commands
 			matchPrompt, matchedPrompt, multiplePromptMatches, err := utils.ContextMatch(
-				userInput, myFakeDevice.CompContextSearch,
+				userInput, myFakeDevice.ContextSearch,
 			)
 			if err != nil {
 				log.Println(err)
@@ -53,28 +55,28 @@ func GenericCiscoHandler(myFakeDevice *fakedevices.FakeDevice) {
 			// Handle any context switching
 			if matchPrompt && !multiplePromptMatches {
 				// switch contexts as needed
+				ContextState = matchedPrompt
 				term.SetPrompt(string(
-					myFakeDevice.Hostname + myFakeDevice.ContextSearch[matchedPrompt],
+					myFakeDevice.Hostname+ContextState.Mode,
 				))
-				ContextState = myFakeDevice.ContextSearch[matchedPrompt]
 				continue
-			} else if userInput == "exit" || userInput == "end" {
+			} else if userInput == "exit" || userInput == "end" || strings.HasPrefix(ContextState.ExitCmd, userInput) {
 				// Back out of the lower contexts, i.e. drop from "(config)#" to "#"
-				if myFakeDevice.ContextHierarchy[ContextState] == "exit" {
+				if ContextState.Up == 0 {
 					break
 				} else {
+				    ContextState = myFakeDevice.ContextHierarchy[ContextState.Up]
 					term.SetPrompt(string(
-						myFakeDevice.Hostname + myFakeDevice.ContextHierarchy[ContextState],
+						myFakeDevice.Hostname + ContextState.Mode,
 					))
-					ContextState = myFakeDevice.ContextHierarchy[ContextState]
 					continue
 				}
 			} else if userInput == "reset state" {
 				term.Write(append([]byte("Resetting State..."), '\n'))
-				ContextState = myFakeDevice.ContextSearch["base"]
+				ContextState = myFakeDevice.ContextHierarchy[0] // base
 				myFakeDevice.Hostname = myFakeDevice.DefaultHostname
 				term.SetPrompt(string(
-					myFakeDevice.Hostname + ContextState,
+					myFakeDevice.Hostname + ContextState.Mode,
 				))
 				continue 
 			}
@@ -83,17 +85,17 @@ func GenericCiscoHandler(myFakeDevice *fakedevices.FakeDevice) {
 			userInputFields := strings.Fields(userInput)
 
 			// Handle hostname changes
-			if userInputFields[0] == "hostname" && ContextState == "(config)#" {
+			if userInputFields[0] == "hostname" && ContextState.Id == 3 {
 				// Set the hostname to the values after "hostname" in the userInputFields
 				myFakeDevice.Hostname = strings.Join(userInputFields[1:], " ")
 				log.Printf("Setting hostname to %s\n", myFakeDevice.Hostname)
-				term.SetPrompt(myFakeDevice.Hostname + ContextState)
+				term.SetPrompt(myFakeDevice.Hostname + ContextState.Mode)
 				continue
 			}
 
 			// Run userInput through the command matcher to look at supportedCommands
 			//match, matchedCommand, multipleMatches, err := utils.CmdMatch(userInput, myFakeDevice.SupportedCommands)
-			match, matchedCommand, multipleMatches, err := utils.ContextMatch(userInput, myFakeDevice.CompiledSupportedCommands)
+			match, matchedCommand, multipleMatches, err := utils.CommandMatch(userInput, myFakeDevice.SupportedCommands)
 			if err != nil {
 				log.Println(err)
 				break
@@ -102,7 +104,7 @@ func GenericCiscoHandler(myFakeDevice *fakedevices.FakeDevice) {
 			if match && !multipleMatches {
 				// Render the matched command output
 				output, err := fakedevices.TranscriptReader(
-					myFakeDevice.SupportedCommands[matchedCommand],
+					matchedCommand,
 					myFakeDevice,
 				)
 				if err != nil {
@@ -117,7 +119,7 @@ func GenericCiscoHandler(myFakeDevice *fakedevices.FakeDevice) {
 				term.Write(append([]byte("% Ambiguous command:  \""+userInput+"\""), '\n'))
 				continue
 			} else {
-                if !strings.HasPrefix(ContextState, "(config") {
+                if ContextState.Id < 3 { // Not in config mode
 				    // If all else fails, we did not recognize the input!
 				    term.Write(append([]byte("% Unknown command:  \""+userInput+"\""), '\n'))
                 }

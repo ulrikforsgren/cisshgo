@@ -12,70 +12,43 @@ platforms:
         "terminal width <R>.*": "transcripts/empty.txt"
         "write mem": "transcripts/cisco/csr1000v/write_mem.txt"
         "!": "transcripts/empty.txt"
-      context_hierarchy:
-        "(config-if)#": "(config)#"
-        "(config-router-af)#": "(config-router)#"
-        "(config-router)#": "(config)#"
-        "(config)#": "#"
-        "#": ">"
-        ">": "exit"
       context_search:
-        "interface <R>Ethernet[0-9]+/[.0-9]+": "(config-if)#"
-        "interface <R>GigabitEthernet[0-9]+/[.0-9]+": "(config-if)#"
-        "router bgp <R>[0-9]+": "(config-router)#"
-        "address-family ipv4 unicast": "(config-router-af)#"
-        "<R>exit-address-family": "(config-router)#"
-        "configure terminal": "(config)#"
-        "config t": "(config)#"
-        "enable": "#"
-        "base": ">"
-  - iosxr:
-      vendor: "cisco"
-      hostname: "cisshgoiosxr"
-      password: "admin"
-      command_transcripts:
-        "show running-config": "transcripts/cisco/iosxr/show_running-config.txt"
-        "show version": "transcripts/cisco/iosxr/show_version_brief.txt"
-        "show version brief": "transcripts/cisco/iosxr/show_version_brief.txt"
-        "show confd-state version": "transcripts/cisco/iosxr/show_confd-state_version.txt"
-        "show confd-state loaded-data-models data-model tailf-ned-cisco-ios-xr": "transcripts/cisco/iosxr/show_confd-state_loaded-data-models_data-model_tailf-ned-cisco-ios-xr.txt"
-        "terminal length <R>.*": "transcripts/empty.txt"
-        "terminal width <R>.*": "transcripts/empty.txt"
-      context_hierarchy:
-        "(config-bgp-nbr)#": "(config-bgp-vrf)#"
-        "(config-bgp-vrf)#": "(config-bgp)#"
-        "(config-bgp-af)#": "(config-bgp)#"
-        "(config-bgp)#": "(config)#"
-        "(config-rpl)#": "(config)#"
-        "(config-if)#": "(config)#"
-        "(config-subif)#": "(config)#"
-        "(config)#": "#"
-        "#": "exit"
-      context_search:
-        "config exclusive": "(config)#"
-        "base": "#"
-        "interface Ethernet <R>([0-9]+/){1,}[0-9]+": "(config-if)#"
-        "interface Ethernet <R>([0-9]+/){1,}[0-9]+.[0-9]+": "(config-subif)#"
-        "interface GigabitEthernet <R>([0-9]+/){1,}[0-9]+": "(config-if)#"
-        "interface GigabitEthernet <R>([0-9]+/){1,}[0-9]+.[0-9]+": "(config-subif)#"
-        "route-policy <R>.*": "(config-rpl)#"
-        "address-family ipv4 unicast": "(config-bgp-af)#"
-  - nx:
-      vendor: "cisco"
-      hostname: "cisshgonx"
-      password: "admin"
-      command_transcripts:
-        "show running-config": "transcripts/cisco/nx/show_running-config.txt"
-        "show version": "transcripts/cisco/nx/show_version.txt"
-        "terminal length 0": "transcripts/empty.txt"
-        "terminal width 511": "transcripts/empty.txt"
-        "terminal length 0 ; terminal width 511 ; show version ; show inventory": "transcripts/cisco/nx/show_version_inventory.txt"
-        "write mem": "transcripts/empty.txt"
-      context_hierarchy:
-        "(config)#": "#"
-        "#": ">"
-        ">": "exit"
-      context_search:
-        "configure terminal": "(config)#"
-        "enable": "#"
-        "base": ">"
+        base:
+            id: 1
+            up: 0
+            mode: ">"
+        enable:
+            id: 2
+            up: 0
+            mode: "#"
+        config terminal:
+            id: 3
+            up: 2
+            mode: "(config)#"
+        interface <R>Ethernet[0-9]+/[.0-9]+:
+            id: 4
+            up: 3
+            mode: "(config-if)#"
+        interface <R>GigabitEthernet[0-9]+/[.0-9]+:
+            id: 6
+            up: 3
+            mode: "(config-if)#"
+        router bgp <R>[0-9]+:
+            id: 7
+            up: 3
+            mode: "(config-router)#"
+        address-family ipv4 unicast:
+            id: 8
+            up: 7
+            mode: "(config-router-af)#"
+            exit-cmd: "exit-address-family"
+        z:
+            id: 9
+            up: 3
+            mode: "(config-z)#"
+            exit-cmd: "<R>exit-z"
+        x:
+            id: 10
+            up: 9
+            mode: "(config-x)#"
+            exit-cmd: "<R>exit-x"

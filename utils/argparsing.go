@@ -2,11 +2,19 @@ package utils
 
 import (
 	"flag"
+//    "fmt"
 	"io/ioutil"
 	"log"
 
 	"gopkg.in/yaml.v2"
 )
+
+type TranscriptMapContext struct {
+    Id                 uint          `yaml:"id" json:"id"`
+    Up                 uint          `yaml:"up" json:"up"`
+    Mode               string       `yaml:"mode" json:"mode"`
+    ExitCmd            string       `yaml:"exit-cmd" json:"exit-cmd"`
+}
 
 // TranscriptMapPlatform struct for use inside of a TranscriptMap struct
 type TranscriptMapPlatform struct {
@@ -14,8 +22,7 @@ type TranscriptMapPlatform struct {
 	Hostname           string            `yaml:"hostname" json:"hostname"`
 	Password           string            `yaml:"password" json:"password"`
 	CommandTranscripts map[string]string `yaml:"command_transcripts" json:"command_transcripts"`
-	ContextSearch      map[string]string `yaml:"context_search" json:"context_search"`
-	ContextHierarchy   map[string]string `yaml:"context_hierarchy" json:"context_hierarchy"`
+	ContextSearch      map[string]*TranscriptMapContext `yaml:"context_search" json:"context_search"`
 }
 
 // TranscriptMap Struct for modeling the TranscriptMap YAML
@@ -24,7 +31,7 @@ type TranscriptMap struct {
 }
 
 // ParseArgs parses command line arguments for cisshgo
-func ParseArgs() (*string, *string, int, *int, TranscriptMap) {
+func ParseArgs() (*string, *string, int, *int, *TranscriptMap) {
 	// Gather command line arguments and parse them
 	vendor := flag.String("vendor", "cisco", "Device vendor")
 	platform := flag.String("platform", "csr1000v", "Device platform")
@@ -52,7 +59,8 @@ func ParseArgs() (*string, *string, int, *int, TranscriptMap) {
 	if err != nil {
 		log.Fatalf("error: %v", err)
 	}
-	// fmt.Printf("YAML Parsed Transcript Map:\n\n%+v\n", myTranscriptMap)
 
-	return vendor, platform, numListeners, startingPortPtr, myTranscriptMap
+	//fmt.Printf("YAML Parsed Transcript Map:\n\n%+v\n", myTranscriptMap)
+
+	return vendor, platform, numListeners, startingPortPtr, &myTranscriptMap
 }
