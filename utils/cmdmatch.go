@@ -233,11 +233,11 @@ func CompileMatches(supportedContexts map[string]*TranscriptMapContext) (*MatchC
 //	match: bool
 // 	matchedCommand: string
 //	error
-func ContextMatch(userInput string, supportedContexts *MatchContexts) (bool, *TranscriptMapContext, bool, error) {
+func ContextMatch(userInput string, supportedContexts *MatchContexts) (bool, *ContextPattern, bool, error) {
 
 	// Setup our return variables
 	match := false
-    var matchedContext *TranscriptMapContext = nil
+    var matchedContext *ContextPattern = nil
 
 	// Turn our input string into fields
 	// fmt.Printf("userInput: %s\n", userInput)
@@ -247,7 +247,7 @@ func ContextMatch(userInput string, supportedContexts *MatchContexts) (bool, *Tr
 	// Iterate through all the commands in the supportedContexts map and create
     // regexp.
 	for _, cmd := range *supportedContexts {
-	    supportedContext := cmd.Context
+	    supportedContext := cmd
         contextFields := cmd.Pattern
         if len(userInputFields) == len(contextFields) {
 	        match = true
