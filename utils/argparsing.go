@@ -1,5 +1,13 @@
 package utils
 
+/*
+ TODO:
+  - Separate reading config and creating structures to be use in the device.
+    - Read config
+    - Compile regexps and ceate hierarchy map
+    - Create hierarchical context list
+*/
+
 import (
 	"flag"
 //    "fmt"
@@ -30,8 +38,17 @@ type TranscriptMap struct {
 	Platforms []map[string]TranscriptMapPlatform `yaml:"platforms" json:"platforms"`
 }
 
+type Transcript struct {
+	Vendor             string
+	Hostname           string
+	Password           string
+	CommandSearch      *MatchCommands
+	ContextSearch      *MatchContexts
+    ContextHierarchy   map[uint]*TranscriptMapContext
+}
+
 // ParseArgs parses command line arguments for cisshgo
-func ParseArgs() (*string, *string, int, *int, *TranscriptMap) {
+func ParseArgs() (*string, *string, int, *int, *Transcript) {
 	// Gather command line arguments and parse them
 	vendor := flag.String("vendor", "cisco", "Device vendor")
 	platform := flag.String("platform", "csr1000v", "Device platform")
@@ -60,7 +77,24 @@ func ParseArgs() (*string, *string, int, *int, *TranscriptMap) {
 		log.Fatalf("error: %v", err)
 	}
 
+    tMap := myTranscriptMap.Platforms[0][*platform]
 	//fmt.Printf("YAML Parsed Transcript Map:\n\n%+v\n", myTranscriptMap)
+    // Create context hierarchy
+    compiledSupportedCommands, _ := CompileCommands(tMap.CommandTranscripts)
+    compiledContextSearch, _ := CompileMatches(tMap.ContextSearch)
+	contextHierarchy :=  make(map[uint]*TranscriptMapContext)
+    for _, mode := range tMap.ContextSearch {
+        contextHierarchy[mode.Id] = mode
+    }
 
-	return vendor, platform, numListeners, startingPortPtr, &myTranscriptMap
+    transcript := Transcript{
+	                  Vendor:           tMap.Vendor,
+	                  Hostname:         tMap.Hostname,
+	                  Password:         tMap.Password,
+	                  CommandSearch:    compiledSupportedCommands,
+	                  ContextSearch:    compiledContextSearch,
+                      ContextHierarchy: contextHierarchy,
+                  }
+
+	return vendor, platform, numListeners, startingPortPtr, &transcript
 }

@@ -187,6 +187,7 @@ func CommandMatch(userInput string, supportedCommands *MatchCommands) (bool, str
 type ContextPattern struct {
     Pattern []interface{}
     Context *TranscriptMapContext
+    Commands MatchContexts
 }
 
 type MatchContexts []*ContextPattern

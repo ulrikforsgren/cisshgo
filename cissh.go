@@ -10,23 +10,13 @@ import (
 func main() {
 
 	// Parse the command line arguments
-	vendor, platform, numListeners, startingPortPtr, myTranscriptMap := utils.ParseArgs()
+	vendor, platform, numListeners, startingPortPtr, transcript := utils.ParseArgs()
 
-    // Create context hierarchy
-	contextHierarchy :=  make(map[uint]*utils.TranscriptMapContext)
-    for _, p := range myTranscriptMap.Platforms {
-        for _, pf := range p {
-            for _, mode := range pf.ContextSearch {
-                contextHierarchy[mode.Id] = mode
-            }
-        }
-    }
 	// Initialize our fake device
 	myFakeDevice := fakedevices.InitGeneric(
 		*vendor,          // Vendor
 		*platform,        // Platform
-		myTranscriptMap, // Transcript map with locations of command output to play back
-        contextHierarchy,
+		transcript,       // Transcript map with locations of command output to play back
 	)
 
 	// Make a Channel named "done" for handling Goroutines, which expects a bool as return value

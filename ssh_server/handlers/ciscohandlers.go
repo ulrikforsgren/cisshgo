@@ -24,7 +24,6 @@ func GenericCiscoHandler(myFakeDevice *fakedevices.FakeDevice) {
 
 		// Setup our initial "context" or prompt
 		ContextState := myFakeDevice.ContextHierarchy[1] // base
-		fmt.Println(myFakeDevice.ContextHierarchy)
 
 		// Setup a terminal with the hostname + initial context state as a prompt
         fmt.Println("ContextState:", ContextState)
@@ -95,7 +94,7 @@ func GenericCiscoHandler(myFakeDevice *fakedevices.FakeDevice) {
 
 			// Run userInput through the command matcher to look at supportedCommands
 			//match, matchedCommand, multipleMatches, err := utils.CmdMatch(userInput, myFakeDevice.SupportedCommands)
-			match, matchedCommand, multipleMatches, err := utils.CommandMatch(userInput, myFakeDevice.SupportedCommands)
+			match, matchedCommand, multipleMatches, err := utils.CommandMatch(userInput, myFakeDevice.CommandSearch)
 			if err != nil {
 				log.Println(err)
 				break
