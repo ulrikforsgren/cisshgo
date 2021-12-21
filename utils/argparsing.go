@@ -44,7 +44,7 @@ type Transcript struct {
 	Password           string
 	CommandSearch      *MatchCommands
 	ContextSearch      *MatchContexts
-    ContextHierarchy   map[uint]*TranscriptMapContext
+    ContextHierarchy   *ContextHierarchy
 }
 
 // ParseArgs parses command line arguments for cisshgo
@@ -81,11 +81,7 @@ func ParseArgs() (*string, *string, int, *int, *Transcript) {
 	//fmt.Printf("YAML Parsed Transcript Map:\n\n%+v\n", myTranscriptMap)
     // Create context hierarchy
     compiledSupportedCommands, _ := CompileCommands(tMap.CommandTranscripts)
-    compiledContextSearch, _ := CompileMatches(tMap.ContextSearch)
-	contextHierarchy :=  make(map[uint]*TranscriptMapContext)
-    for _, mode := range tMap.ContextSearch {
-        contextHierarchy[mode.Id] = mode
-    }
+    compiledContextSearch, contextHierarchy, _ := CompileMatches(tMap.ContextSearch)
 
     transcript := Transcript{
 	                  Vendor:           tMap.Vendor,

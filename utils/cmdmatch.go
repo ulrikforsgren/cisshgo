@@ -192,8 +192,12 @@ type ContextPattern struct {
 
 type MatchContexts []*ContextPattern
 
-func CompileMatches(supportedContexts map[string]*TranscriptMapContext) (*MatchContexts, error) {
-    fieldsMap := make(MatchContexts, 0)
+type ContextHierarchy map[uint]*TranscriptMapContext
+
+
+func CompileMatches(supportedContexts map[string]*TranscriptMapContext) (*MatchContexts, *ContextHierarchy, error) {
+    flatMap := make(MatchContexts, 0)
+    contextHierarchy := make(ContextHierarchy)
 
 	for cmd, ctx := range supportedContexts {
         fields := strings.Fields(strings.ToLower(cmd))
@@ -205,10 +209,15 @@ func CompileMatches(supportedContexts map[string]*TranscriptMapContext) (*MatchC
                 comp_fields[n] = f
             }
         }
-        fieldsMap = append(fieldsMap, &ContextPattern{ Pattern: comp_fields, Context: ctx})
+        flatMap = append(flatMap, &ContextPattern{ Pattern: comp_fields, Context: ctx})
 	}
 
-    return &fieldsMap, nil
+    // Build hierarchy
+    for _, mode := range flatMap {
+        contextHierarchy[mode.Context.Id] = mode.Context
+    }
+
+    return &flatMap, &contextHierarchy, nil
 }
 
 

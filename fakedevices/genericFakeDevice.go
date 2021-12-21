@@ -20,7 +20,7 @@ type FakeDevice struct {
 	Password          string            // Password of the fake device
 	CommandSearch     *utils.MatchCommands // What commands this fake device supports
 	ContextSearch     *utils.MatchContexts // The available CLI prompt/contexts on this fake device
-	ContextHierarchy  map[uint]*utils.TranscriptMapContext // The hierarchy of the available contexts
+	ContextHierarchy  *utils.ContextHierarchy // The hierarchy of the available contexts
 }
 
 // readFile abstracts the standard error handling of opening and reading a file into a string

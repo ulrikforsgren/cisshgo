@@ -23,7 +23,7 @@ func GenericCiscoHandler(myFakeDevice *fakedevices.FakeDevice) {
 		log.Printf("%s: terminal connected\n", s.LocalAddr())
 
 		// Setup our initial "context" or prompt
-		ContextState := myFakeDevice.ContextHierarchy[1] // base
+		ContextState := (*myFakeDevice.ContextHierarchy)[1] // base
 
 		// Setup a terminal with the hostname + initial context state as a prompt
         fmt.Println("ContextState:", ContextState)
@@ -64,7 +64,7 @@ func GenericCiscoHandler(myFakeDevice *fakedevices.FakeDevice) {
 				if ContextState.Up == 0 {
 					break
 				} else {
-				    ContextState = myFakeDevice.ContextHierarchy[ContextState.Up]
+				    ContextState = (*myFakeDevice.ContextHierarchy)[ContextState.Up]
 					term.SetPrompt(string(
 						myFakeDevice.Hostname + ContextState.Mode,
 					))
@@ -72,7 +72,7 @@ func GenericCiscoHandler(myFakeDevice *fakedevices.FakeDevice) {
 				}
 			} else if userInput == "reset state" {
 				term.Write(append([]byte("Resetting State..."), '\n'))
-				ContextState = myFakeDevice.ContextHierarchy[0] // base
+				ContextState = (*myFakeDevice.ContextHierarchy)[0] // base
 				myFakeDevice.Hostname = myFakeDevice.DefaultHostname
 				term.SetPrompt(string(
 					myFakeDevice.Hostname + ContextState.Mode,
