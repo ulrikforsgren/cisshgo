@@ -10,7 +10,7 @@ package utils
 
 import (
 	"flag"
-//    "fmt"
+    "fmt"
 	"io/ioutil"
 	"log"
 
@@ -20,8 +20,9 @@ import (
 type TranscriptMapContext struct {
     Id                 uint          `yaml:"id" json:"id"`
     Up                 uint          `yaml:"up" json:"up"`
-    Mode               string       `yaml:"mode" json:"mode"`
-    ExitCmd            string       `yaml:"exit-cmd" json:"exit-cmd"`
+    Mode               string        `yaml:"mode" json:"mode"`
+    ExitCmd            string        `yaml:"exit-cmd" json:"exit-cmd"`
+    ExitTo             string        `yaml:"exit-to" json:"exit-to"`
 }
 
 // TranscriptMapPlatform struct for use inside of a TranscriptMap struct
@@ -83,6 +84,14 @@ func ParseArgs() (*string, *string, int, *int, *Transcript) {
     compiledSupportedCommands, _ := CompileCommands(tMap.CommandTranscripts)
     compiledContextSearch, contextHierarchy, _ := CompileMatches(tMap.ContextSearch)
 
+//    fmt.Println("============================================")
+//    fmt.Println("Hierarchy:")
+//    first := (*contextHierarchy)[1]
+//    iterateHierarchy(first, "")
+//    fmt.Println("============================================")
+
+
+
     transcript := Transcript{
 	                  Vendor:           tMap.Vendor,
 	                  Hostname:         tMap.Hostname,
@@ -93,4 +102,12 @@ func ParseArgs() (*string, *string, int, *int, *Transcript) {
                   }
 
 	return vendor, platform, numListeners, startingPortPtr, &transcript
+}
+
+
+func iterateHierarchy(node *ContextPattern, indent string) {
+    fmt.Println(indent, node.Context.Id, node.Context.Mode)
+    for _, n := range node.Commands {
+        iterateHierarchy(n, indent+"    ")
+    }
 }

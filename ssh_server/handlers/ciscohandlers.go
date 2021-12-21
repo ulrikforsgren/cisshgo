@@ -3,8 +3,9 @@
 package handlers
 
 import (
-    "fmt"
+//    "fmt"
 	"log"
+    "strconv"
 	"strings"
 
 	"github.com/gliderlabs/ssh"
@@ -23,10 +24,9 @@ func GenericCiscoHandler(myFakeDevice *fakedevices.FakeDevice) {
 		log.Printf("%s: terminal connected\n", s.LocalAddr())
 
 		// Setup our initial "context" or prompt
-		ContextState := (*myFakeDevice.ContextHierarchy)[1] // base
+		ContextState := (*myFakeDevice.ContextHierarchy)[1].Context // base
 
 		// Setup a terminal with the hostname + initial context state as a prompt
-        fmt.Println("ContextState:", ContextState)
 		term := terminal.NewTerminal(s, myFakeDevice.Hostname+ContextState.Mode)
 
 		// Iterate over any user input that is provided at the terminal
@@ -60,11 +60,16 @@ func GenericCiscoHandler(myFakeDevice *fakedevices.FakeDevice) {
 				))
 				continue
 			} else if userInput == "exit" || userInput == "end" || strings.HasPrefix(ContextState.ExitCmd, userInput) {
+                up := ContextState.Up
+                if ContextState.ExitTo != "" {
+                    up64, _ := strconv.ParseUint(ContextState.ExitTo, 10 ,0)
+                    up = uint(up64)
+                }
 				// Back out of the lower contexts, i.e. drop from "(config)#" to "#"
-				if ContextState.Up == 0 {
+				if up == 0 {
 					break
 				} else {
-				    ContextState = (*myFakeDevice.ContextHierarchy)[ContextState.Up]
+				    ContextState = (*myFakeDevice.ContextHierarchy)[up].Context
 					term.SetPrompt(string(
 						myFakeDevice.Hostname + ContextState.Mode,
 					))
@@ -72,7 +77,7 @@ func GenericCiscoHandler(myFakeDevice *fakedevices.FakeDevice) {
 				}
 			} else if userInput == "reset state" {
 				term.Write(append([]byte("Resetting State..."), '\n'))
-				ContextState = (*myFakeDevice.ContextHierarchy)[0] // base
+				ContextState = (*myFakeDevice.ContextHierarchy)[0].Context // base
 				myFakeDevice.Hostname = myFakeDevice.DefaultHostname
 				term.SetPrompt(string(
 					myFakeDevice.Hostname + ContextState.Mode,

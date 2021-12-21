@@ -192,7 +192,7 @@ type ContextPattern struct {
 
 type MatchContexts []*ContextPattern
 
-type ContextHierarchy map[uint]*TranscriptMapContext
+type ContextHierarchy map[uint]*ContextPattern
 
 
 func CompileMatches(supportedContexts map[string]*TranscriptMapContext) (*MatchContexts, *ContextHierarchy, error) {
@@ -212,9 +212,16 @@ func CompileMatches(supportedContexts map[string]*TranscriptMapContext) (*MatchC
         flatMap = append(flatMap, &ContextPattern{ Pattern: comp_fields, Context: ctx})
 	}
 
+    // Build hierarchy index
+    for _, mode := range flatMap {
+        contextHierarchy[mode.Context.Id] = mode
+    }
+
     // Build hierarchy
     for _, mode := range flatMap {
-        contextHierarchy[mode.Context.Id] = mode.Context
+        if mode.Context.Up != 0 {
+            contextHierarchy[mode.Context.Up].Commands = append(contextHierarchy[mode.Context.Up].Commands, mode)
+        }
     }
 
     return &flatMap, &contextHierarchy, nil

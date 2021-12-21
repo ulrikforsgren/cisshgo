@@ -19,8 +19,9 @@ platforms:
             mode: ">"
         enable:
             id: 2
-            up: 0
+            up: 1
             mode: "#"
+            exit-to: 0
         config terminal:
             id: 3
             up: 2
