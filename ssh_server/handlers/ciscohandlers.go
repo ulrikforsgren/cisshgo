@@ -35,7 +35,7 @@ func GenericCiscoHandler(myFakeDevice *fakedevices.FakeDevice) {
 			if err != nil {
 				break
 			}
-		    log.Printf("%s: %d %v\n", s.LocalAddr(), ContextState.Context.Id, userInput)
+		    log.Printf("%s: %s %v\n", s.LocalAddr(), ContextState.Context.Mode, userInput)
 
 			// Handle any empty input (assumed to just be a carriage return)
 			if userInput == "" {

@@ -195,12 +195,12 @@ type MatchContexts []*ContextPattern
 type ContextHierarchy map[uint]*ContextPattern
 
 
-func CompileMatches(supportedContexts map[string]*TranscriptMapContext) (*MatchContexts, *ContextHierarchy, error) {
+func CompileMatches(supportedContexts []*TranscriptMapContext) (*MatchContexts, *ContextHierarchy, error) {
     flatMap := make(MatchContexts, 0)
     contextHierarchy := make(ContextHierarchy)
 
-	for cmd, ctx := range supportedContexts {
-        fields := strings.Fields(strings.ToLower(cmd))
+	for _, ctx := range supportedContexts {
+        fields := strings.Fields(strings.ToLower(ctx.Cmd))
         comp_fields := make([]interface{}, len(fields))
         for n,f := range fields {
             if  strings.HasPrefix(f, "<r>") {

@@ -13,43 +13,429 @@ platforms:
         "write mem": "transcripts/cisco/csr1000v/write_mem.txt"
         "!": "transcripts/empty.txt"
       context_search:
-        base:
+        -
+            cmd: base
             id: 1
             up: 0
             mode: ">"
-        enable:
+        -
+            cmd: enable
             id: 2
             up: 1
             mode: "#"
             exit-to: 0
-        config terminal:
+        -
+            cmd: config terminal
             id: 3
             up: 2
             mode: "(config)#"
-        interface <R>Ethernet[0-9]+/[.0-9]+:
+        -
+            cmd: vrf definition <R>.+
             id: 4
             up: 3
-            mode: "(config-if)#"
-        interface <R>GigabitEthernet[0-9]+/[.0-9]+:
+            mode: "(config-vrf)#"
+        -
+            cmd: address-family ipv4
+            id: 5
+            up: 4
+            mode: "(config-vrf-af)#"
+            exit-cmd: "exit-address-family"
+        -
+            cmd: address-family ipv6
             id: 6
-            up: 3
-            mode: "(config-if)#"
-        router bgp <R>[0-9]+:
+            up: 4
+            mode: "(config-vrf-af)#"
+            exit-cmd: "exit-address-family"
+        -
+            cmd: class-map <R>.+
             id: 7
             up: 3
-            mode: "(config-router)#"
-        address-family ipv4 unicast:
+            mode: "(config-cmap)#"
+        -
+            cmd: policy-map <R>.+
             id: 8
-            up: 7
-            mode: "(config-router-af)#"
-            exit-cmd: "exit-address-family"
-        z:
-            id: 9
             up: 3
-            mode: "(config-z)#"
-            exit-cmd: "<R>exit-z"
-        x:
+            mode: "(config-pmap)#"
+        -
+            cmd: class <R>.+|class-default
+            id: 9
+            up: 8
+            mode: "(config-pmap-c)#"
+        -
+            cmd: police-policy-map police
             id: 10
             up: 9
-            mode: "(config-x)#"
-            exit-cmd: "<R>exit-x"
+            mode: "(config-pmap-c-police)#"
+        -
+            cmd: police-cir-percent police cir percent
+            id: 11
+            up: 9
+            mode: "(config-pmap-c-police)#"
+        -
+            cmd: police-rate-unit police rate
+            id: 12
+            up: 9
+            mode: "(config-pmap-c-police)#"
+        -
+            cmd: police-rate-percent police rate percent
+            id: 13
+            up: 9
+            mode: "(config-pmap-c-police)#"
+        -
+            cmd: police-rate-pdp police rate pdp
+            id: 14
+            up: 9
+            mode: "(config-pmap-c-police)#"
+        -
+            cmd: police-flow police flow
+            id: 15
+            up: 9
+            mode: "(config-pmap-c-police)#"
+        -
+            cmd: police-catalyst police
+            id: 16
+            up: 9
+            mode: "(config-pmap-c-police)#"
+        -
+            cmd: vlan vlan-list <R>[0-9]+
+            id: 17
+            up: 3
+            mode: "(config-vlan)#"
+        -
+            cmd: interface Loopback <R>([0-9\.])+
+            id: 18
+            up: 3
+            mode: "(config-if)#"
+        -
+            cmd: frame-relay interface-dlci
+            id: 19
+            up: 18
+            mode: "(config-fr-dlci)#"
+        -
+            cmd: interface Tunnel <R>[0-9]+
+            id: 20
+            up: 3
+            mode: "(config-if)#"
+        -
+            cmd: frame-relay interface-dlci
+            id: 21
+            up: 20
+            mode: "(config-fr-dlci)#"
+        -
+            cmd: interface Multilink <R>[0-9]+
+            id: 22
+            up: 3
+            mode: "(config-if)#"
+        -
+            cmd: frame-relay interface-dlci
+            id: 23
+            up: 22
+            mode: "(config-fr-dlci)#"
+        -
+            cmd: interface Ethernet <R>[0-9]+.*
+            id: 24
+            up: 3
+            mode: "(config-if)#"
+        -
+            cmd: interface <R>Ethernet[0-9]+.*
+            id: 81
+            up: 3
+            mode: "(config-if)#"
+        -
+            cmd: xconnect
+            id: 25
+            up: 24
+            mode: "(config-xconn)#"
+        -
+            cmd: service instance <R>[0-9]+
+            id: 26
+            up: 24
+            mode: "(config-if-srv)#"
+        -
+            cmd: xconnect
+            id: 27
+            up: 26
+            mode: "(config-xconn)#"
+        -
+            cmd: cfm mep
+            id: 28
+            up: 26
+            mode: "(config-if-srv-ecfm-mep)#"
+        -
+            cmd: frame-relay interface-dlci
+            id: 29
+            up: 24
+            mode: "(config-fr-dlci)#"
+        -
+            cmd: interface Vlan <R>[0-9]+ xconnect
+            id: 30
+            up: 3
+            mode: "(config-xconn)#"
+        -
+            cmd: interface Vlan <R>[0-9]+ service instance <R>[0-9]+
+            id: 31
+            up: 3
+            mode: "(config-if-srv)#"
+        -
+            cmd: xconnect
+            id: 32
+            up: 31
+            mode: "(config-xconn)#"
+        -
+            cmd: cfm mep
+            id: 33
+            up: 31
+            mode: "(config-if-srv-ecfm-mep)#"
+        -
+            cmd: interface Vlan <R>[0-9]+ frame-relay interface-dlci
+            id: 34
+            up: 3
+            mode: "(config-fr-dlci)#"
+        -
+            cmd: route-map <R>.+ <R>[0-9]+
+            id: 35
+            up: 3
+            mode: "(config-route-map)#"
+        -
+            cmd: router mobile
+            id: 36
+            up: 3
+            mode: "(config-router)#"
+        -
+            cmd: router bgp <R>[0-9]+
+            id: 37
+            up: 3
+            mode: "(config-router)#"
+        -
+            cmd: template peer-policy <R>.+
+            id: 38
+            up: 37
+            mode: "(config-router-ptmp)#"
+            exit-cmd: "exit-peer-policy"
+        -
+            cmd: template peer-session <R>.+
+            id: 39
+            up: 37
+            mode: "(config-router-stmp)#"
+            exit-cmd: "exit-peer-session"
+        -
+            cmd: address-family ipv4 <R>unicast|multicast|mdt|tunnel|labeled-unicast
+            id: 40
+            up: 37
+            mode: "(config-router-af)#"
+            exit-cmd: "exit-address-family"
+        -
+            cmd: address-family ipv6 <R>unicast|multicast
+            id: 41
+            up: 37
+            mode: "(config-router-af)#"
+            exit-cmd: "exit-address-family"
+        -
+            cmd: address-family with-vrf ipv4 <R>unicast|multicast|mdt|tunnel|labeled-unicast vrf <R>.+
+            id: 42
+            up: 37
+            mode: "(config-router-af)#"
+            exit-cmd: "exit-address-family"
+        -
+            cmd: address-family ipv6-with-vrf ipv6 <R>unicast|multicast vrf <R>.+
+            id: 43
+            up: 37
+            mode: "(config-router-af)#"
+            exit-cmd: "exit-address-family"
+        -
+            cmd: address-family vpnv4 <R>unicast
+            id: 44
+            up: 37
+            mode: "(config-router-af)#"
+            exit-cmd: "exit-address-family"
+        -
+            cmd: address-family vpnv6 <R>unicast
+            id: 45
+            up: 37
+            mode: "(config-router-af)#"
+            exit-cmd: "exit-address-family"
+        -
+            cmd: address-family l2vpn <R>vpls
+            id: 46
+            up: 37
+            mode: "(config-router-af)#"
+            exit-cmd: "exit-address-family"
+        -
+            cmd: address-family nsap <R>unicast
+            id: 47
+            up: 37
+            mode: "(config-router-af)#"
+            exit-cmd: "exit-address-family"
+        -
+            cmd: address-family rtfilter <R>unicast
+            id: 48
+            up: 37
+            mode: "(config-router-af)#"
+            exit-cmd: "exit-address-family"
+        -
+            cmd: router eigrp <R>[0-9]+|.+
+            id: 49
+            up: 3
+            mode: "(config-router)#"
+        -
+            cmd: router ospfv3 <R>[0-9]+
+            id: 50
+            up: 3
+            mode: "(config-router)#"
+        -
+            cmd: address-family ipv4 unicast
+            id: 51
+            up: 50
+            mode: "(config-router-af)#"
+            exit-cmd: "exit-address-family"
+        -
+            cmd: address-family ipv6 unicast
+            id: 52
+            up: 50
+            mode: "(config-router-af)#"
+            exit-cmd: "exit-address-family"
+        -
+            cmd: router ospf <R>[0-9]+
+            id: 53
+            up: 3
+            mode: "(config-router)#"
+        -
+            cmd: router isis
+            id: 54
+            up: 3
+            mode: "(config-router)#"
+        -
+            cmd: isis-main-container address-family ipv6 unicast
+            id: 55
+            up: 54
+            mode: "(config-router-af)#"
+            exit-cmd: "exit-address-family"
+        -
+            cmd: router isis-container isis <R>.+
+            id: 56
+            up: 3
+            mode: "(config-router)#"
+        -
+            cmd: isis-main-container address-family ipv6 unicast
+            id: 57
+            up: 56
+            mode: "(config-router-af)#"
+            exit-cmd: "exit-address-family"
+        -
+            cmd: router rip
+            id: 58
+            up: 3
+            mode: "(config-router)#"
+        -
+            cmd: address-family ipv4 unicast
+            id: 59
+            up: 58
+            mode: "(config-router-af)#"
+            exit-cmd: "exit-address-family"
+        -
+            cmd: address-family ipv4 vrf <R>.+
+            id: 60
+            up: 58
+            mode: "(config-router-af)#"
+            exit-cmd: "exit-address-family"
+        -
+            cmd: router lisp
+            id: 61
+            up: 3
+            mode: "(config-router-lisp)#"
+        -
+            cmd: locator-set <R>.+
+            id: 62
+            up: 61
+            mode: "(config-router-lisp-locator-set)#"
+        -
+            cmd: eid-table default-vrf <R>default
+            id: 63
+            up: 61
+            mode: "(config-router-lisp-eid-table)#"
+        -
+            cmd: eid-table vrf <R>.+
+            id: 64
+            up: 61
+            mode: "(config-router-lisp-eid-table)#"
+        -
+            cmd: site <R>.+
+            id: 65
+            up: 61
+            mode: "(config-router-lisp-site)#"
+        -
+            cmd: router router-lisp lisp <R>[0-9]+
+            id: 66
+            up: 3
+            mode: "(config-router-lisp)#"
+        -
+            cmd: locator-set <R>.+
+            id: 67
+            up: 66
+            mode: "(config-router-lisp-locator-set)#"
+        -
+            cmd: eid-table default-vrf <R>default
+            id: 68
+            up: 66
+            mode: "(config-router-lisp-eid-table)#"
+        -
+            cmd: eid-table vrf <R>.+
+            id: 69
+            up: 66
+            mode: "(config-router-lisp-eid-table)#"
+        -
+            cmd: site <R>.+
+            id: 70
+            up: 66
+            mode: "(config-router-lisp-site)#"
+        -
+            cmd: ipc zone default
+            id: 71
+            up: 3
+            mode: "(config-ipczone)#"
+        -
+            cmd: trunk group <R>.+
+            id: 72
+            up: 3
+            mode: "(config-trunk-group)#"
+        -
+            cmd: voice-card <R>[0-9]+
+            id: 73
+            up: 3
+            mode: "(config-voicecard)#"
+        -
+            cmd: voice service voip
+            id: 74
+            up: 3
+            mode: "(conf-voi-serv)#"
+        -
+            cmd: sip
+            id: 75
+            up: 74
+            mode: "(conf-serv-sip)#"
+        -
+            cmd: voice translation-rule <R>[0-9]+
+            id: 76
+            up: 3
+            mode: "(cfg-translation-rule)#"
+        -
+            cmd: voice translation-profile <R>.+
+            id: 77
+            up: 3
+            mode: "(cfg-translation-profile)#"
+        -
+            cmd: event manager applet <R>.+
+            id: 78
+            up: 3
+            mode: "(config-applet)#"
+            exit-cmd: "exit"
+        -
+            cmd: trigger
+            id: 79
+            up: 78
+            mode: "(config-applet-trigger)#"
+        -
+            cmd: transceiver type all
+            id: 80
+            up: 3
+            mode: "(config-xcvr-type)#"

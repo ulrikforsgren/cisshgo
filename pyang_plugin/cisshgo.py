@@ -8,6 +8,7 @@ a working  context tree.
 
 import json
 import pprint as pp
+import sys
 
 from pyang import plugin, error, types, statements
 from pyang.util import unique_prefixes
@@ -17,6 +18,10 @@ pprint = pp.PrettyPrinter(indent=4).pprint
 def pyang_plugin_init():
     plugin.register_plugin(CisshgoPlugin())
 
+
+hid = 3
+
+
 class CisshgoPlugin(plugin.PyangPlugin):
     def add_output_format(self, fmts):
         self.multiple_modules = True
@@ -24,6 +29,8 @@ class CisshgoPlugin(plugin.PyangPlugin):
 
     def setup_fmt(self, ctx):
         ctx.implicit_errors = False
+        ctx.identifier_state = self
+        self.nodes = {}
 
     def emit(self, ctx, modules, fd):
         """Main control function.
@@ -42,15 +49,17 @@ class CisshgoPlugin(plugin.PyangPlugin):
                 annots[module.arg + ":" + ann.arg] = (
                     "string" if typ is None else self.base_type(ann, typ))
         for module in modules:
-            self.process_children(module)
-        #pprint(tree)
+            self.process_children(module, 3)
 
-    def process_children(self, node, indent=0, commands=None):
+
+    def process_children(self, node, hparent, indent=0, commands=None):
         """Process all children of `node`, except "rpc" and "notification".
         """
+        global hid
         cli_mode_name = None
+        cli_exit_command = None
         if indent == 0:
-          print("(config)#")
+          #print("(config)#")
           indent+= 4
           commands = []
         for st in node.substmts:
@@ -59,94 +68,120 @@ class CisshgoPlugin(plugin.PyangPlugin):
                 if m == "tailf-common":
                     if k == "cli-mode-name":
                         cli_mode_name = st.arg
-
+                    elif k == "cli-exit-command":
+                        cli_exit_command = st.arg
+        """
+        Other statements to consider:
+         - tailf:cli-allow-join-with-key
+         - tailf:cli-suppress-mode
+         - tailf:cli-add-mode
+         - tailf:cli-drop-node-name
+        """
+ 
         if node.keyword == 'list':
           self.key_data(node, commands)
         if cli_mode_name:
+          hid += 1
           modes = f"{' '*indent}{cli_mode_name}"
-          print(f"{modes:<70} {commands}")
+          #print(f"{modes:<70} {commands}")
+          commands = [ self.regexp_command(c) for c in commands ]
+          commands = [ c for c in self.flatten_list(commands) ]
+          print("        -")
+          print(f"            cmd: {' '.join(commands)}")
+          print(f"            id: {hid}")
+          print(f"            up: {hparent}")
+          print(f"            mode: \"({cli_mode_name})#\"")
+          hparent = hid
+          if cli_exit_command:
+            print(f"            exit-cmd: \"{cli_exit_command}\"")
           indent += 4
           commands = []
         for ch in node.i_children:
             if ch.keyword in ["rpc", "notification"]:
                 continue
             if ch.keyword in ["choice", "case"]:
-                self.process_children(ch, indent, commands.copy())
+                self.process_children(ch, hparent, indent, commands.copy())
                 continue
             if ch.keyword == "container":
                 cmds = commands.copy()
                 cmds.append(ch.arg)
-                self.process_children(ch, indent, cmds)
+                self.process_children(ch, hparent, indent, cmds)
             elif ch.keyword == "list":
                 cmds = commands.copy()
                 cmds.append(ch.arg)
-                self.process_children(ch, indent, cmds)
+                self.process_children(ch, hparent, indent, cmds)
             elif ch.keyword in ["leaf", "leaf-list"]:
                 continue
 
     def key_data(self, node, commands):
       key = []
       for k in node.i_key:
-          #print(k, type(k))
           assert(type(k) is statements.LeafLeaflistStatement)
-          kp = self.type_data(k)
+          t = k.search_one("type")
+          kp = self.type_data(t)
           key.append(kp)
-      commands.append(f"{{{','.join(key)}}}")
+      commands.append(key)
 
-    def type_data(self, k):
-      tp = []
-      for x in k.substmts:
-          kp = ""
-          st = type(x)
-          if st is statements.Statement:
-            pass
-            # Ignore extension statements, e.g.
-            # tail:info "XYZ";
-          elif st is statements.TypeStatement:
-            ts = type(x.i_type_spec)
-            t = x.i_type_spec.name
-            if ts is types.RangeTypeSpec:
-              assert(t in ["int8", "int16", "int32", "int64",
-                          "uint8", "uint16", "uint32", "uint64"])
-              #print("RANGE:", x.i_ranges)
-              # Not required
-              # Only Regexp for generic numerical
-              # pattern is required
-            elif ts is types.PatternTypeSpec:
-              assert(t == "string")
-              #print("PATTERN:", x.i_type_spec.res)
-              # Should be compiled to Regexp
-              # Most important when combined with key
-              # Is the len always 1?
-              kp = str(x.i_type_spec.res[0])
-            elif ts is types.EnumTypeSpec:
-              assert(t == "enumeration")
-              #print("ENUMS:", x.i_type_spec.enums)
-              # Can easily be compiled into a Regexp.
-              # First implementation can accept
-              # anything.
-              kp = "/".join([e for e,_ in x.i_type_spec.enums])
-              #kp = x.i_type_spec.enums
-            elif ts is types.StringTypeSpec:
-              assert(t == "string")
-            elif ts is types.UnionTypeSpec:
-              # Investigate how to combine to a single
-              # Regexp? or create two regexps
-              #kp = kp or "union"
-              kp = kp or self.type_data(x)
+    def flatten_list(self, lst):
+      for i in lst:
+        if type(i) is list:
+          for j in i:
+            yield j
+        else:
+          yield i
 
-            elif ts is types.IntTypeSpec:
-              assert(t in ["int8", "int16", "int32", "int64",
-                          "uint8", "uint16", "uint32", "uint64"])
-              # Not required.
-            elif ts is types.LengthTypeSpec:
-              assert(t == "string")
-              # Not required.
-            else:
-              print(f"UNKNOWN TYPE: {ts}")
-            kp = kp or t
-            tp.append(kp)
-      return ' or '.join(tp)
+    def regexp_command(self, key):
+        if type(key) is str: return key
+        return [ f'<R>{self.regexp_string(l)}' for l in key ]
+
+    def regexp_string(self, t):
+        kp, p2 = t
+        if kp == 'string':
+            if not p2:
+                return '.+'
+            return '|'.join(p2)
+        if kp[:4] == 'uint':
+            return '[0-9]+'
+        if kp[:3] == 'int':
+            return '-{0,1}[0-9]+'
+        if kp == 'union':
+            r = [ self.regexp_string(p) for p in p2 ]
+            return '|'.join(r)
+        if kp == 'enumeration':
+            #TODO: escape special regexp characters needed.
+            return '|'.join(p2)
+        print(f"ERROR: Unhandled data type {kp} {p2}")
+        sys.exit(2)
+
+    def type_data(self, t, union=False, level=0):
+        ts = t.i_type_spec
+        tst = type(ts)
+
+        #print("   "*level, t, ts.name, tst)
+        if tst is types.IntTypeSpec:
+            return (ts.name, '')
+        if tst is types.RangeTypeSpec:
+            return (ts.name, '')
+        elif tst is types.StringTypeSpec:
+            return (ts.name, '')
+        elif tst is types.LengthTypeSpec: # Strings with only a length restriction
+            return (ts.name, '')
+        elif tst is types.PatternTypeSpec: # Strings with patterns and optional length
+            return (ts.name, [ str(p) for p in ts.res ])
+        elif tst is types.EnumTypeSpec:
+            return (ts.name, [e for e,_ in ts.enums])
+        elif tst is types.UnionTypeSpec:
+            ta = []
+            if t.i_typedef:
+                t = t.i_typedef.search_one('type')
+            subtypes = t.search("type")
+            assert(len(subtypes) or t.i_typedef)
+            for st in subtypes:
+                ta.append(self.type_data(st, level=level+1))
+            return (ts.name, ta)
+        else:
+            raise TypeError(f"Can't handle type: {t.arg} {tst}")
+
 
     def base_type(self, ch, of_type):
         """Return the base type of `of_type`."""

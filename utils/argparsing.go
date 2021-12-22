@@ -18,6 +18,7 @@ import (
 )
 
 type TranscriptMapContext struct {
+    Cmd                string        `yaml:"cmd" json:"cmd"`
     Id                 uint          `yaml:"id" json:"id"`
     Up                 uint          `yaml:"up" json:"up"`
     Mode               string        `yaml:"mode" json:"mode"`
@@ -31,7 +32,7 @@ type TranscriptMapPlatform struct {
 	Hostname           string            `yaml:"hostname" json:"hostname"`
 	Password           string            `yaml:"password" json:"password"`
 	CommandTranscripts map[string]string `yaml:"command_transcripts" json:"command_transcripts"`
-	ContextSearch      map[string]*TranscriptMapContext `yaml:"context_search" json:"context_search"`
+	ContextSearch      []*TranscriptMapContext `yaml:"context_search" json:"context_search"`
 }
 
 // TranscriptMap Struct for modeling the TranscriptMap YAML
