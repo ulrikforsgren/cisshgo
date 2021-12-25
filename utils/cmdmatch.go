@@ -1,7 +1,7 @@
 package utils
 
 import (
-//	"fmt"
+	// "fmt"
     "regexp"
 	"strings"
 )
@@ -184,8 +184,62 @@ func CommandMatch(userInput string, supportedCommands *MatchCommands) (bool, str
 
 
 
+type Pattern interface{
+    Match(string)(int)
+}
+
+
+type StringMatch struct {
+    s string
+}
+
+func (s StringMatch)Match(cmd string)(int) {
+    // fmt.Print("StringMatch")
+    if strings.HasPrefix(s.s, cmd) {
+        // fmt.Println(" -> MATCH")
+        return 1
+    }
+    // fmt.Println(" -> NOMATCH")
+    return 0
+}
+
+type RegexpMatch struct {
+    r *regexp.Regexp
+}
+
+func (r RegexpMatch)Match(cmd string)(int) {
+    // fmt.Print("RegexpMatch")
+    if r.r.MatchString(cmd) {
+        // fmt.Println(" -> MATCH")
+        return 1
+    }
+    // fmt.Println(" -> NOMATCH")
+    return 0
+}
+
+type JoinKeyMatch struct {
+    s string
+    r *regexp.Regexp
+}
+
+func (j JoinKeyMatch)Match(cmd string)(int) {
+    // fmt.Print("JoinKeyMatch")
+    if strings.HasPrefix(j.s, cmd) {
+        // fmt.Println(" -> s MATCH")
+        return 1
+    }
+    if j.r.MatchString(cmd) {
+        // fmt.Println(" -> r MATCH")
+        return 2
+    }
+    // fmt.Println(" -> NOMATCH")
+    return 0
+}
+
+
+
 type ContextPattern struct {
-    Pattern []interface{}
+    Pattern []Pattern
     Context *TranscriptMapContext
     Commands MatchContexts
 }
@@ -201,12 +255,20 @@ func CompileMatches(supportedContexts []*TranscriptMapContext) (*MatchContexts, 
 
 	for _, ctx := range supportedContexts {
         fields := strings.Fields(strings.ToLower(ctx.Cmd))
-        comp_fields := make([]interface{}, len(fields))
+        comp_fields := make([]Pattern, len(fields))
         for n,f := range fields {
-            if  strings.HasPrefix(f, "<r>") {
-                comp_fields[n] =regexp.MustCompile("^"+f[3:]+"$")
+            if strings.HasPrefix(f, "<r>") {
+                comp_fields[n] = RegexpMatch{regexp.MustCompile("^"+f[3:]+"$")}
+            } else if strings.HasPrefix(f, "<j>") {
+                r := fields[n+1]
+                // TODO: Check statement existence + type <r>
+                m := JoinKeyMatch{
+                        s: f[3:],
+                        r: regexp.MustCompile("^"+f[3:]+r[3:]+"$"),
+                }
+                comp_fields[n] = m
             } else {
-                comp_fields[n] = f
+                comp_fields[n] = StringMatch{f}
             }
         }
         flatMap = append(flatMap, &ContextPattern{ Pattern: comp_fields, Context: ctx})
@@ -236,6 +298,7 @@ func CompileMatches(supportedContexts []*TranscriptMapContext) (*MatchContexts, 
 func ContextMatch(userInput string, supportedContexts *MatchContexts) (bool, *ContextPattern, bool, error) {
 
 	// Setup our return variables
+//    fmt.Println("ContextMatch")
 	match := false
     var matchedContext *ContextPattern = nil
 
@@ -247,34 +310,31 @@ func ContextMatch(userInput string, supportedContexts *MatchContexts) (bool, *Co
 	// Iterate through all the commands in the supportedContexts map and create
     // regexp.
 	for _, cmd := range *supportedContexts {
+        // fmt.Println("Matching command", cmd.Context.Cmd)
 	    supportedContext := cmd
         contextFields := cmd.Pattern
-        if len(userInputFields) == len(contextFields) {
-	        match = true
-            fieldsLoop: for n,f := range contextFields {
-                switch f.(type) {
-                case string:
-                    //fmt.Println("COMP string", f, userInputFields[n])
-                    if !strings.HasPrefix(f.(string), userInputFields[n]) {
-                        match = false
-                        //fmt.Println("NO MATCH!")
-                        break fieldsLoop
-                    }
-                    //fmt.Println("MATCH!")
-                default: // *regexp.Regexp
-                    //fmt.Println("COMP regexp", f, userInputFields[n])
-                    if f.(*regexp.Regexp).MatchString(userInputFields[n]) == false {
-                        match = false
-                        //fmt.Println("NO MATCH!")
-                        break fieldsLoop
-                    }
-                    //fmt.Println("MATCH!")
-                }
+
+        n_i := 0
+        n_c := 0
+	    match = true
+        for n_i<len(userInputFields) && n_c<len(contextFields) {
+            f := contextFields[n_c]
+            m_c := f.Match(userInputFields[n_i])
+            if m_c == 0 {
+                match = false
+                // fmt.Println("BREAK")
+                break
             }
-            if match {
+            n_c += m_c
+            n_i += 1
+        }
+        if match {
+            // fmt.Println(n_i, len(userInputFields), n_c, len(contextFields))
+            if n_i==len(userInputFields) && n_c==len(contextFields) {
                 matchedContext = supportedContext
                 break
             }
+            // fmt.Println("Len mismatch", match)
         }
 	}
 
