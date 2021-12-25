@@ -52,16 +52,17 @@ class CisshgoPlugin(plugin.PyangPlugin):
             self.process_children(module, 3)
 
 
-    def process_children(self, node, hparent, indent=0, commands=None):
+    ### TODO: Refactor for better structure ( only proccess children...)
+    def process_children(self, node, hparent, commands=None):
         """Process all children of `node`, except "rpc" and "notification".
         """
         global hid
         cli_mode_name = None
         cli_exit_command = None
-        if indent == 0:
-          #print("(config)#")
-          indent+= 4
-          commands = []
+        cli_allow_join_with_key = False
+        cli_drop_node_name = False
+        commands = commands or []
+
         for st in node.substmts:
             if type(st.keyword) is tuple:
                 m, k = st.keyword
@@ -70,57 +71,60 @@ class CisshgoPlugin(plugin.PyangPlugin):
                         cli_mode_name = st.arg
                     elif k == "cli-exit-command":
                         cli_exit_command = st.arg
+                    elif k == "cli-allow-join-with-key":
+                        cli_allow_join_with_key = True
+                    elif k == "cli-drop-node-name":
+                        cli_drop_node_name = True
         """
-        Other statements to consider:
-         - tailf:cli-allow-join-with-key
+        Other statements to_consider:
          - tailf:cli-suppress-mode
          - tailf:cli-add-mode
-         - tailf:cli-drop-node-name
+         - 
         """
  
-        if node.keyword == 'list':
-          self.key_data(node, commands)
+        if node.keyword == 'container':
+          assert(cli_allow_join_with_key == False)
+          if not cli_drop_node_name:
+            commands.append(node.arg)
+        elif node.keyword == 'list':
+          if not cli_drop_node_name:
+            join = "<J>" if cli_allow_join_with_key else ""
+            commands.append(f"{join}{node.arg}")
+          commands.append(self.key_data(node))
         if cli_mode_name:
-          hid += 1
-          modes = f"{' '*indent}{cli_mode_name}"
-          #print(f"{modes:<70} {commands}")
           commands = [ self.regexp_command(c) for c in commands ]
           commands = [ c for c in self.flatten_list(commands) ]
-          print("        -")
-          print(f"            cmd: {' '.join(commands)}")
-          print(f"            id: {hid}")
-          print(f"            up: {hparent}")
-          print(f"            mode: \"({cli_mode_name})#\"")
+          self.print_entry(commands, hparent, cli_mode_name, cli_exit_command)
           hparent = hid
-          if cli_exit_command:
-            print(f"            exit-cmd: \"{cli_exit_command}\"")
-          indent += 4
           commands = []
         for ch in node.i_children:
-            if ch.keyword in ["rpc", "notification"]:
-                continue
             if ch.keyword in ["choice", "case"]:
-                self.process_children(ch, hparent, indent, commands.copy())
-                continue
-            if ch.keyword == "container":
-                cmds = commands.copy()
-                cmds.append(ch.arg)
-                self.process_children(ch, hparent, indent, cmds)
+                self.process_children(ch, hparent, commands.copy())
+            elif ch.keyword == "container":
+                self.process_children(ch, hparent, commands.copy())
             elif ch.keyword == "list":
-                cmds = commands.copy()
-                cmds.append(ch.arg)
-                self.process_children(ch, hparent, indent, cmds)
-            elif ch.keyword in ["leaf", "leaf-list"]:
-                continue
+                self.process_children(ch, hparent, commands.copy())
 
-    def key_data(self, node, commands):
+    def print_entry(self, commands, hparent, cli_mode_name, cli_exit_command):
+        global hid
+        hid += 1
+        print("        -")
+        print(f"            cmd: {' '.join(commands)}")
+        print(f"            id: {hid}")
+        print(f"            up: {hparent}")
+        print(f"            mode: \"({cli_mode_name})#\"")
+        hparent = hid
+        if cli_exit_command:
+          print(f"            exit-cmd: \"{cli_exit_command}\"")
+
+    def key_data(self, node):
       key = []
       for k in node.i_key:
           assert(type(k) is statements.LeafLeaflistStatement)
           t = k.search_one("type")
           kp = self.type_data(t)
           key.append(kp)
-      commands.append(key)
+      return key
 
     def flatten_list(self, lst):
       for i in lst:
@@ -139,6 +143,10 @@ class CisshgoPlugin(plugin.PyangPlugin):
         if kp == 'string':
             if not p2:
                 return '.+'
+            for p in p2:
+              if '\\p' in p:
+                # TODO: Make XSD specific regexit Go/Python compaible
+                return "XSD-SPECIFIC-REGEXP"
             return '|'.join(p2)
         if kp[:4] == 'uint':
             return '[0-9]+'

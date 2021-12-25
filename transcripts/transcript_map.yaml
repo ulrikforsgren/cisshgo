@@ -47,395 +47,1281 @@ platforms:
             mode: "(config-vrf-af)#"
             exit-cmd: "exit-address-family"
         -
-            cmd: class-map <R>.+
+            cmd: aaa group server radius <R>.+
             id: 7
+            up: 3
+            mode: "(config-sg-radius)#"
+        -
+            cmd: aaa accounting system default
+            id: 8
+            up: 3
+            mode: "(cfg-acct-mlist)#"
+        -
+            cmd: aaa attribute list <R>.+
+            id: 9
+            up: 3
+            mode: "(config-attr-list)#"
+        -
+            cmd: cable tag <R>[0-9]+
+            id: 10
+            up: 3
+            mode: "(config-cmts-tag)#"
+        -
+            cmd: cable load-balance docsis-group FN <R>[0-9]+
+            id: 11
+            up: 3
+            mode: "(config-lb-group)#"
+        -
+            cmd: cable load-balance docsis-group <R>[0-9]+
+            id: 12
+            up: 3
+            mode: "(config-lb-group)#"
+        -
+            cmd: cable l2vpn <R>.+
+            id: 13
+            up: 3
+            mode: "(config-l2vpn)#"
+        -
+            cmd: service instance <R>[0-9]+
+            id: 14
+            up: 13
+            mode: "(config-ethsrv)#"
+        -
+            cmd: xconnect
+            id: 15
+            up: 14
+            mode: "(config-xconn)#"
+        -
+            cmd: cable rcc-template <R>[0-9]+
+            id: 16
+            up: 3
+            mode: "(config-rcc-template)#"
+        -
+            cmd: cable fiber-node <R>[0-9]+
+            id: 17
+            up: 3
+            mode: "(config-fiber-node)#"
+        -
+            cmd: l2tp-class <R>.+
+            id: 18
+            up: 3
+            mode: "(config-l2tp-class)#"
+        -
+            cmd: depi-class <R>.+
+            id: 19
+            up: 3
+            mode: "(config-depi-class)#"
+        -
+            cmd: depi-tunnel <R>.+
+            id: 20
+            up: 3
+            mode: "(config-depi-tunnel)#"
+        -
+            cmd: autonomic registrar
+            id: 21
+            up: 3
+            mode: "(config-registrar)#"
+        -
+            cmd: controller <R>T1|E1|T3 <R>.+
+            id: 22
+            up: 3
+            mode: "(config-controller)#"
+        -
+            cmd: controller Cellular <R>[0-9]+
+            id: 23
+            up: 3
+            mode: "(config-controller)#"
+        -
+            cmd: controller Modular-Cable <R>.+
+            id: 24
+            up: 3
+            mode: "(config-controller)#"
+        -
+            cmd: controller wanphy <R>.+
+            id: 25
+            up: 3
+            mode: "(config-controller)#"
+        -
+            cmd: ip vrf <R>.+
+            id: 26
+            up: 3
+            mode: "(config-vrf)#"
+        -
+            cmd: ip dhcp pool <R>.+
+            id: 27
+            up: 3
+            mode: "(dhcp-config)#"
+        -
+            cmd: ip dhcp class <R>.+
+            id: 28
+            up: 3
+            mode: "(config-dhcp-class)#"
+        -
+            cmd: relay agent information
+            id: 29
+            up: 28
+            mode: "(config-dhcp-class-relayinfo)#"
+        -
+            cmd: ip flow-aggregation cache <R>.+
+            id: 30
+            up: 3
+            mode: "(config-flow-cache)#"
+        -
+            cmd: ip mobile router
+            id: 31
+            up: 3
+            mode: "(mobile-router)#"
+        -
+            cmd: ip explicit-path identifier <R>[0-9]+
+            id: 32
+            up: 3
+            mode: "(cfg-ip-expl-path)#"
+        -
+            cmd: ip explicit-path name <R>.+
+            id: 33
+            up: 3
+            mode: "(cfg-ip-expl-path)#"
+        -
+            cmd: ip access-list standard <R>[0-9]+|[0-9]+|.+
+            id: 34
+            up: 3
+            mode: "(config-std-nacl)#"
+        -
+            cmd: ip access-list extended <R>[0-9]+|[0-9]+|.+
+            id: 35
+            up: 3
+            mode: "(config-ext-nacl)#"
+        -
+            cmd: ip sla <R>[0-9]+
+            id: 36
+            up: 3
+            mode: "(config-ip-sla)#"
+        -
+            cmd: udp-jitter <R>XSD-SPECIFIC-REGEXP|XSD-SPECIFIC-REGEXP|((([a-zA-Z0-9_]([a-zA-Z0-9\-_]){0,61})?[a-zA-Z0-9]\.)*([a-zA-Z0-9_]([a-zA-Z0-9\-_]){0,61})?[a-zA-Z0-9]\.?)|\.|XSD-SPECIFIC-REGEXP <R>[0-9]+
+            id: 37
+            up: 36
+            mode: "(config-ip-sla-jitter)#"
+        -
+            cmd: icmp-echo <R>XSD-SPECIFIC-REGEXP|XSD-SPECIFIC-REGEXP|((([a-zA-Z0-9_]([a-zA-Z0-9\-_]){0,61})?[a-zA-Z0-9]\.)*([a-zA-Z0-9_]([a-zA-Z0-9\-_]){0,61})?[a-zA-Z0-9]\.?)|\.
+            id: 38
+            up: 36
+            mode: "(config-ip-sla-echo)#"
+        -
+            cmd: udp-echo <R>XSD-SPECIFIC-REGEXP|XSD-SPECIFIC-REGEXP|((([a-zA-Z0-9_]([a-zA-Z0-9\-_]){0,61})?[a-zA-Z0-9]\.)*([a-zA-Z0-9_]([a-zA-Z0-9\-_]){0,61})?[a-zA-Z0-9]\.?)|\. <R>[0-9]+
+            id: 39
+            up: 36
+            mode: "(config-ip-sla-udp)#"
+        -
+            cmd: ethernet y1731 delay <R>1DM|DMM|DMMv1
+            id: 40
+            up: 36
+            mode: "(config-sla-y1731-delay)#"
+        -
+            cmd: ethernet y1731 delay receive <R>1DM
+            id: 41
+            up: 36
+            mode: "(config-sla-y1731-delay)#"
+        -
+            cmd: ethernet y1731 loss <R>LMM|SLM
+            id: 42
+            up: 36
+            mode: "(config-sla-y1731-loss)#"
+        -
+            cmd: ipv6 access-list <R>.+
+            id: 43
+            up: 3
+            mode: "(config-ipv6-acl)#"
+        -
+            cmd: archive
+            id: 44
+            up: 3
+            mode: "(config-archive)#"
+        -
+            cmd: log config
+            id: 45
+            up: 44
+            mode: "(config-archive-log-cfg)#"
+        -
+            cmd: key chain <R>.+
+            id: 46
+            up: 3
+            mode: "(config-keychain)#"
+        -
+            cmd: key <R>[0-9]+
+            id: 47
+            up: 46
+            mode: "(config-keychain-key)#"
+        -
+            cmd: table-map <R>.+
+            id: 48
+            up: 3
+            mode: "(config-tablemap)#"
+        -
+            cmd: redundancy
+            id: 49
+            up: 3
+            mode: "(config-red)#"
+        -
+            cmd: linecard-group <R>[0-9]+
+            id: 50
+            up: 49
+            mode: "(config-red-lc)#"
+        -
+            cmd: main-cpu
+            id: 51
+            up: 49
+            mode: "(config-r-mc)#"
+        -
+            cmd: interchassis group <R>[0-9]+
+            id: 52
+            up: 49
+            mode: "(conppfig-r-ic)#"
+        -
+            cmd: class-map <R>.+
+            id: 53
             up: 3
             mode: "(config-cmap)#"
         -
             cmd: policy-map <R>.+
-            id: 8
+            id: 54
             up: 3
             mode: "(config-pmap)#"
         -
             cmd: class <R>.+|class-default
-            id: 9
-            up: 8
+            id: 55
+            up: 54
             mode: "(config-pmap-c)#"
         -
-            cmd: police-policy-map police
-            id: 10
-            up: 9
+            cmd: police
+            id: 56
+            up: 55
             mode: "(config-pmap-c-police)#"
         -
-            cmd: police-cir-percent police cir percent
-            id: 11
-            up: 9
+            cmd: police cir percent
+            id: 57
+            up: 55
             mode: "(config-pmap-c-police)#"
         -
-            cmd: police-rate-unit police rate
-            id: 12
-            up: 9
+            cmd: police rate
+            id: 58
+            up: 55
             mode: "(config-pmap-c-police)#"
         -
-            cmd: police-rate-percent police rate percent
-            id: 13
-            up: 9
+            cmd: police rate percent
+            id: 59
+            up: 55
             mode: "(config-pmap-c-police)#"
         -
-            cmd: police-rate-pdp police rate pdp
-            id: 14
-            up: 9
+            cmd: police rate pdp
+            id: 60
+            up: 55
             mode: "(config-pmap-c-police)#"
         -
-            cmd: police-flow police flow
-            id: 15
-            up: 9
+            cmd: police flow
+            id: 61
+            up: 55
             mode: "(config-pmap-c-police)#"
         -
-            cmd: police-catalyst police
-            id: 16
-            up: 9
+            cmd: police
+            id: 62
+            up: 55
             mode: "(config-pmap-c-police)#"
         -
-            cmd: vlan vlan-list <R>[0-9]+
-            id: 17
+            cmd: bridge-domain <R>[0-9]+
+            id: 63
+            up: 3
+            mode: "(config-bdomain)#"
+        -
+            cmd: vlan <R>[0-9]+
+            id: 64
             up: 3
             mode: "(config-vlan)#"
         -
-            cmd: interface Loopback <R>([0-9\.])+
-            id: 18
+            cmd: crypto keyring <R>.+
+            id: 65
             up: 3
-            mode: "(config-if)#"
+            mode: "(conf-keyring)#"
         -
-            cmd: frame-relay interface-dlci
-            id: 19
-            up: 18
-            mode: "(config-fr-dlci)#"
-        -
-            cmd: interface Tunnel <R>[0-9]+
-            id: 20
+            cmd: crypto ikev2 name-mangler <R>.+
+            id: 66
             up: 3
-            mode: "(config-if)#"
+            mode: "(config-ikev2-name-mangler)#"
         -
-            cmd: frame-relay interface-dlci
-            id: 21
-            up: 20
-            mode: "(config-fr-dlci)#"
-        -
-            cmd: interface Multilink <R>[0-9]+
-            id: 22
+            cmd: crypto ikev2 authorization policy <R>.+
+            id: 67
             up: 3
-            mode: "(config-if)#"
+            mode: "(config-ikev2-author-policy)#"
         -
-            cmd: frame-relay interface-dlci
-            id: 23
-            up: 22
-            mode: "(config-fr-dlci)#"
-        -
-            cmd: interface Ethernet <R>[0-9]+.*
-            id: 24
+            cmd: crypto ikev2 keyring <R>.+
+            id: 68
             up: 3
-            mode: "(config-if)#"
+            mode: "(config-ikev2-keyring)#"
         -
-            cmd: interface <R>Ethernet[0-9]+.*
+            cmd: peer <R>.+
+            id: 69
+            up: 68
+            mode: "(config-ikev2-keyring-peer)#"
+        -
+            cmd: crypto ikev2 profile <R>.+
+            id: 70
+            up: 3
+            mode: "(config-ikev2-profile)#"
+        -
+            cmd: crypto pki server <R>.+
+            id: 71
+            up: 3
+            mode: "(cs-server)#"
+        -
+            cmd: crypto pki trustpoint <R>.+
+            id: 72
+            up: 3
+            mode: "(ca-trustpoint)#"
+        -
+            cmd: crypto pki certificate chain <R>.+
+            id: 73
+            up: 3
+            mode: "(config-cert-chain)#"
+        -
+            cmd: certificate <R>.+
+            id: 74
+            up: 73
+            mode: "(config-pki-hexmode-quotedstring)#"
+            exit-cmd: "quit"
+        -
+            cmd: crypto isakmp profile <R>.+
+            id: 75
+            up: 3
+            mode: "(conf-isa-prof)#"
+        -
+            cmd: crypto isakmp policy <R>[0-9]+
+            id: 76
+            up: 3
+            mode: "(config-isakmp)#"
+        -
+            cmd: crypto ipsec transform-set <R>.+
+            id: 77
+            up: 3
+            mode: "(cfg-crypto-trans)#"
+        -
+            cmd: crypto ipsec profile <R>.+
+            id: 78
+            up: 3
+            mode: "(ipsec-profile)#"
+        -
+            cmd: crypto gdoi group <R>.+
+            id: 79
+            up: 3
+            mode: "(config-gdoi-group)#"
+        -
+            cmd: server local
+            id: 80
+            up: 79
+            mode: "(gdoi-local-server)#"
+        -
+            cmd: sa ipsec <R>[0-9]+
             id: 81
+            up: 80
+            mode: "(gdoi-sa-ipsec)#"
+        -
+            cmd: redundancy
+            id: 82
+            up: 80
+            mode: "(gdoi-coop-ks-config)#"
+        -
+            cmd: crypto dynamic-map <R>.+ <R>[0-9]+
+            id: 83
+            up: 3
+            mode: "(config-crypto-map)#"
+        -
+            cmd: crypto map <R>.+ <R>[0-9]+
+            id: 84
+            up: 3
+            mode: "(config-crypto-map)#"
+        -
+            cmd: crypto ssl proposal <R>.+
+            id: 85
+            up: 3
+            mode: "(config-crypto-ssl-proposal)#"
+        -
+            cmd: crypto ssl authorization policy <R>.+
+            id: 86
+            up: 3
+            mode: "(config-crypto-ssl-auth-policy)#"
+        -
+            cmd: crypto ssl policy <R>.+
+            id: 87
+            up: 3
+            mode: "(config-crypto-ssl-policy)#"
+        -
+            cmd: crypto ssl profile <R>.+
+            id: 88
+            up: 3
+            mode: "(config-crypto-ssl-profile)#"
+        -
+            cmd: track <R>[0-9]+
+            id: 89
+            up: 3
+            mode: "(config-track)#"
+        -
+            cmd: ethernet evc <R>.+
+            id: 90
+            up: 3
+            mode: "(config-evc)#"
+        -
+            cmd: ethernet cfm domain <R>.+
+            id: 91
+            up: 3
+            mode: "(config-ecfm)#"
+        -
+            cmd: service <R>.+
+            id: 92
+            up: 91
+            mode: "(config-ecfm-srv)#"
+        -
+            cmd: ethernet ring g8032 profile <R>.+
+            id: 93
+            up: 3
+            mode: "(config-erp-profile)#"
+        -
+            cmd: ethernet ring g8032 <R>.+
+            id: 94
+            up: 3
+            mode: "(config-erp-ring)#"
+        -
+            cmd: port0
+            id: 95
+            up: 94
+            mode: "(config-erp-ring-port)#"
+        -
+            cmd: port1
+            id: 96
+            up: 94
+            mode: "(config-erp-ring-port)#"
+        -
+            cmd: instance <R>[0-9]+
+            id: 97
+            up: 94
+            mode: "(config-erp-inst)#"
+        -
+            cmd: aps-channel
+            id: 98
+            up: 97
+            mode: "(config-erp-inst-aps)#"
+        -
+            cmd: interface <J>Null <R>[0-9]+
+            id: 99
+            up: 3
+            mode: "(config-if)#"
+        -
+            cmd: interface <J>Loopback <R>([0-9\.])+
+            id: 100
+            up: 3
+            mode: "(config-if)#"
+        -
+            cmd: frame-relay interface-dlci
+            id: 101
+            up: 100
+            mode: "(config-fr-dlci)#"
+        -
+            cmd: interface <J>Embedded-Service-Engine <R>[0-9]+.*
+            id: 102
+            up: 3
+            mode: "(config-if)#"
+        -
+            cmd: frame-relay interface-dlci
+            id: 103
+            up: 102
+            mode: "(config-fr-dlci)#"
+        -
+            cmd: interface <J>Tunnel <R>[0-9]+
+            id: 104
+            up: 3
+            mode: "(config-if)#"
+        -
+            cmd: frame-relay interface-dlci
+            id: 105
+            up: 104
+            mode: "(config-fr-dlci)#"
+        -
+            cmd: interface <J>Port-channel <R>[0-9]+
+            id: 106
             up: 3
             mode: "(config-if)#"
         -
             cmd: xconnect
-            id: 25
-            up: 24
+            id: 107
+            up: 106
             mode: "(config-xconn)#"
         -
             cmd: service instance <R>[0-9]+
-            id: 26
-            up: 24
+            id: 108
+            up: 106
             mode: "(config-if-srv)#"
         -
             cmd: xconnect
-            id: 27
-            up: 26
+            id: 109
+            up: 108
             mode: "(config-xconn)#"
         -
             cmd: cfm mep
-            id: 28
-            up: 26
+            id: 110
+            up: 108
             mode: "(config-if-srv-ecfm-mep)#"
         -
             cmd: frame-relay interface-dlci
-            id: 29
-            up: 24
+            id: 111
+            up: 106
             mode: "(config-fr-dlci)#"
         -
-            cmd: interface Vlan <R>[0-9]+ xconnect
-            id: 30
+            cmd: interface <J>Port-channel <R>[0-9]+\.[0-9]+
+            id: 112
+            up: 3
+            mode: "(config-subif)#"
+        -
+            cmd: xconnect
+            id: 113
+            up: 112
+            mode: "(config-xconn)#"
+        -
+            cmd: service instance <R>[0-9]+
+            id: 114
+            up: 112
+            mode: "(config-if-srv)#"
+        -
+            cmd: xconnect
+            id: 115
+            up: 114
+            mode: "(config-xconn)#"
+        -
+            cmd: cfm mep
+            id: 116
+            up: 114
+            mode: "(config-if-srv-ecfm-mep)#"
+        -
+            cmd: frame-relay interface-dlci
+            id: 117
+            up: 112
+            mode: "(config-fr-dlci)#"
+        -
+            cmd: interface <J>Multilink <R>[0-9]+
+            id: 118
+            up: 3
+            mode: "(config-if)#"
+        -
+            cmd: frame-relay interface-dlci
+            id: 119
+            up: 118
+            mode: "(config-fr-dlci)#"
+        -
+            cmd: interface <J>MFR <R>[0-9]+
+            id: 120
+            up: 3
+            mode: "(config-if)#"
+        -
+            cmd: frame-relay interface-dlci
+            id: 121
+            up: 120
+            mode: "(config-fr-dlci)#"
+        -
+            cmd: interface <J>MFR <R>[0-9]+\.[0-9]+
+            id: 122
+            up: 3
+            mode: "(config-subif)#"
+        -
+            cmd: frame-relay interface-dlci
+            id: 123
+            up: 122
+            mode: "(config-fr-dlci)#"
+        -
+            cmd: interface <J>BRI <R>[0-9]+
+            id: 124
+            up: 3
+            mode: "(config-if)#"
+        -
+            cmd: frame-relay interface-dlci
+            id: 125
+            up: 124
+            mode: "(config-fr-dlci)#"
+        -
+            cmd: interface <J>Ethernet <R>[0-9]+.*
+            id: 126
+            up: 3
+            mode: "(config-if)#"
+        -
+            cmd: xconnect
+            id: 127
+            up: 126
+            mode: "(config-xconn)#"
+        -
+            cmd: service instance <R>[0-9]+
+            id: 128
+            up: 126
+            mode: "(config-if-srv)#"
+        -
+            cmd: xconnect
+            id: 129
+            up: 128
+            mode: "(config-xconn)#"
+        -
+            cmd: cfm mep
+            id: 130
+            up: 128
+            mode: "(config-if-srv-ecfm-mep)#"
+        -
+            cmd: frame-relay interface-dlci
+            id: 131
+            up: 126
+            mode: "(config-fr-dlci)#"
+        -
+            cmd: interface <J>FastEthernet <R>[0-9]+.*
+            id: 132
+            up: 3
+            mode: "(config-if)#"
+        -
+            cmd: xconnect
+            id: 133
+            up: 132
+            mode: "(config-xconn)#"
+        -
+            cmd: service instance <R>[0-9]+
+            id: 134
+            up: 132
+            mode: "(config-if-srv)#"
+        -
+            cmd: xconnect
+            id: 135
+            up: 134
+            mode: "(config-xconn)#"
+        -
+            cmd: cfm mep
+            id: 136
+            up: 134
+            mode: "(config-if-srv-ecfm-mep)#"
+        -
+            cmd: frame-relay interface-dlci
+            id: 137
+            up: 132
+            mode: "(config-fr-dlci)#"
+        -
+            cmd: interface <J>GigabitEthernet <R>[0-9]+.*
+            id: 138
+            up: 3
+            mode: "(config-if)#"
+        -
+            cmd: xconnect
+            id: 139
+            up: 138
+            mode: "(config-xconn)#"
+        -
+            cmd: service instance <R>[0-9]+
+            id: 140
+            up: 138
+            mode: "(config-if-srv)#"
+        -
+            cmd: xconnect
+            id: 141
+            up: 140
+            mode: "(config-xconn)#"
+        -
+            cmd: cfm mep
+            id: 142
+            up: 140
+            mode: "(config-if-srv-ecfm-mep)#"
+        -
+            cmd: frame-relay interface-dlci
+            id: 143
+            up: 138
+            mode: "(config-fr-dlci)#"
+        -
+            cmd: interface <J>TenGigabitEthernet <R>[0-9]+.*
+            id: 144
+            up: 3
+            mode: "(config-if)#"
+        -
+            cmd: xconnect
+            id: 145
+            up: 144
+            mode: "(config-xconn)#"
+        -
+            cmd: service instance <R>[0-9]+
+            id: 146
+            up: 144
+            mode: "(config-if-srv)#"
+        -
+            cmd: xconnect
+            id: 147
+            up: 146
+            mode: "(config-xconn)#"
+        -
+            cmd: cfm mep
+            id: 148
+            up: 146
+            mode: "(config-if-srv-ecfm-mep)#"
+        -
+            cmd: frame-relay interface-dlci
+            id: 149
+            up: 144
+            mode: "(config-fr-dlci)#"
+        -
+            cmd: interface <J>BDI <R>[0-9]+
+            id: 150
+            up: 3
+            mode: "(config-if)#"
+        -
+            cmd: frame-relay interface-dlci
+            id: 151
+            up: 150
+            mode: "(config-fr-dlci)#"
+        -
+            cmd: interface <J>Cable <R>[0-9]+.*
+            id: 152
+            up: 3
+            mode: "(config-if)#"
+        -
+            cmd: frame-relay interface-dlci
+            id: 153
+            up: 152
+            mode: "(config-fr-dlci)#"
+        -
+            cmd: cable upstream bonding-group <R>[0-9]+
+            id: 154
+            up: 152
+            mode: "(config-upstream-bonding)#"
+        -
+            cmd: interface <J>Modular-Cable <R>[0-9]+.*
+            id: 155
+            up: 3
+            mode: "(config-if)#"
+        -
+            cmd: frame-relay interface-dlci
+            id: 156
+            up: 155
+            mode: "(config-fr-dlci)#"
+        -
+            cmd: interface <J>Wideband-Cable <R>[0-9]+.*
+            id: 157
+            up: 3
+            mode: "(config-if)#"
+        -
+            cmd: frame-relay interface-dlci
+            id: 158
+            up: 157
+            mode: "(config-fr-dlci)#"
+        -
+            cmd: interface <J>Bundle <R>[0-9]+
+            id: 159
+            up: 3
+            mode: "(config-if)#"
+        -
+            cmd: frame-relay interface-dlci
+            id: 160
+            up: 159
+            mode: "(config-fr-dlci)#"
+        -
+            cmd: interface <J>Cellular <R>[0-9]+.*
+            id: 161
+            up: 3
+            mode: "(config-if)#"
+        -
+            cmd: frame-relay interface-dlci
+            id: 162
+            up: 161
+            mode: "(config-fr-dlci)#"
+        -
+            cmd: interface <J>Vlan <R>[0-9]+ xconnect
+            id: 163
             up: 3
             mode: "(config-xconn)#"
         -
-            cmd: interface Vlan <R>[0-9]+ service instance <R>[0-9]+
-            id: 31
+            cmd: interface <J>Vlan <R>[0-9]+ service instance <R>[0-9]+
+            id: 164
             up: 3
             mode: "(config-if-srv)#"
         -
             cmd: xconnect
-            id: 32
-            up: 31
+            id: 165
+            up: 164
             mode: "(config-xconn)#"
         -
             cmd: cfm mep
-            id: 33
-            up: 31
+            id: 166
+            up: 164
             mode: "(config-if-srv-ecfm-mep)#"
         -
-            cmd: interface Vlan <R>[0-9]+ frame-relay interface-dlci
-            id: 34
+            cmd: interface <J>Vlan <R>[0-9]+ frame-relay interface-dlci
+            id: 167
             up: 3
             mode: "(config-fr-dlci)#"
         -
+            cmd: interface <J>Async <R>[0-9]+ frame-relay interface-dlci
+            id: 168
+            up: 3
+            mode: "(config-fr-dlci)#"
+        -
+            cmd: interface <J>Group-Async <R>[0-9]+ frame-relay interface-dlci
+            id: 169
+            up: 3
+            mode: "(config-fr-dlci)#"
+        -
+            cmd: interface <J>Serial <R>[0-9]+.*
+            id: 170
+            up: 3
+            mode: "(config-if)#"
+        -
+            cmd: frame-relay interface-dlci
+            id: 171
+            up: 170
+            mode: "(config-fr-dlci)#"
+        -
+            cmd: interface <J>Serial <R>[0-9]+.*\..*
+            id: 172
+            up: 3
+            mode: "(config-subif)#"
+        -
+            cmd: frame-relay interface-dlci
+            id: 173
+            up: 172
+            mode: "(config-fr-dlci)#"
+        -
+            cmd: interface <J>Virtual-Template <R>[0-9]+
+            id: 174
+            up: 3
+            mode: "(config-if)#"
+        -
+            cmd: xconnect
+            id: 175
+            up: 174
+            mode: "(config-xconn)#"
+        -
+            cmd: service instance <R>[0-9]+
+            id: 176
+            up: 174
+            mode: "(config-if-srv)#"
+        -
+            cmd: xconnect
+            id: 177
+            up: 176
+            mode: "(config-xconn)#"
+        -
+            cmd: cfm mep
+            id: 178
+            up: 176
+            mode: "(config-if-srv-ecfm-mep)#"
+        -
+            cmd: frame-relay interface-dlci
+            id: 179
+            up: 174
+            mode: "(config-fr-dlci)#"
+        -
+            cmd: interface <J>pseudowire <R>[0-9]+
+            id: 180
+            up: 3
+            mode: "(config-if)#"
+        -
+            cmd: interface <J>LISP <R>[0-9]+
+            id: 181
+            up: 3
+            mode: "(config-if)#"
+        -
+            cmd: frame-relay interface-dlci
+            id: 182
+            up: 181
+            mode: "(config-fr-dlci)#"
+        -
+            cmd: interface <J>LISP <R>[0-9]+\.[0-9]+
+            id: 183
+            up: 3
+            mode: "(config-subif)#"
+        -
+            cmd: frame-relay interface-dlci
+            id: 184
+            up: 183
+            mode: "(config-fr-dlci)#"
+        -
+            cmd: virtual-service <R>.+
+            id: 185
+            up: 3
+            mode: "(config-virt-serv)#"
+        -
             cmd: route-map <R>.+ <R>[0-9]+
-            id: 35
+            id: 186
             up: 3
             mode: "(config-route-map)#"
         -
+            cmd: pseudowire-class <R>.+
+            id: 187
+            up: 3
+            mode: "(config-pw-class)#"
+        -
+            cmd: control-plane
+            id: 188
+            up: 3
+            mode: "(config-cp)#"
+        -
+            cmd: connect <R>.+ <R>.+
+            id: 189
+            up: 3
+            mode: "(config-connection)#"
+        -
+            cmd: voice-port <R>.+
+            id: 190
+            up: 3
+            mode: "(config-voiceport)#"
+        -
+            cmd: dial-peer voice <R>[0-9]+
+            id: 191
+            up: 3
+            mode: "(config-dial-peer)#"
+        -
+            cmd: mgcp profile <R>default|.+
+            id: 192
+            up: 3
+            mode: "(config-mgcp-profile)#"
+        -
+            cmd: gatekeeper
+            id: 193
+            up: 3
+            mode: "(config-gk)#"
+        -
+            cmd: line console <R>0
+            id: 194
+            up: 3
+            mode: "(config-line)#"
+        -
+            cmd: line aux <R>0
+            id: 195
+            up: 3
+            mode: "(config-line)#"
+        -
+            cmd: line vty <R>[0-9]+
+            id: 196
+            up: 3
+            mode: "(config-line)#"
+        -
+            cmd: line vty <R>[0-9]+ <R>[0-9]+
+            id: 197
+            up: 3
+            mode: "(config-line)#"
+        -
+            cmd: line <R>.+
+            id: 198
+            up: 3
+            mode: "(config-line)#"
+        -
+            cmd: line <R>[0-9]+ <R>[0-9]+
+            id: 199
+            up: 3
+            mode: "(config-line)#"
+        -
+            cmd: pnp profile <R>.+
+            id: 200
+            up: 3
+            mode: "(config-pnp-init)#"
+        -
+            cmd: flow-sampler-map <R>.+
+            id: 201
+            up: 3
+            mode: "(config-sampler)#"
+        -
+            cmd: ptp clock ordinary domain <R>[0-9]+
+            id: 202
+            up: 3
+            mode: "(config-ptp-clk)#"
+        -
+            cmd: clock-port <R>.+ <R>master|slave
+            id: 203
+            up: 202
+            mode: "(config-ptp-port)#"
+        -
+            cmd: spanning-tree mst configuration
+            id: 204
+            up: 3
+            mode: "(config-mst)#"
+        -
+            cmd: parameter-map type inspect <R>.+
+            id: 205
+            up: 3
+            mode: "(config-profile)#"
+        -
+            cmd: l2 vfi <R>.+
+            id: 206
+            up: 3
+            mode: "(config-vfi)#"
+        -
+            cmd: l2vpn vfi context <R>.+
+            id: 207
+            up: 3
+            mode: "(config-vfi)#"
+        -
+            cmd: autodiscovery bgp signaling bgp
+            id: 208
+            up: 207
+            mode: "(config-vfi-autodiscovery)#"
+        -
+            cmd: l2vpn xconnect context <R>.+
+            id: 209
+            up: 3
+            mode: "(config-xconnect)#"
+        -
+            cmd: zone security <R>.+
+            id: 210
+            up: 3
+            mode: "(config-sec-zone)#"
+        -
+            cmd: zone-pair security <R>.+
+            id: 211
+            up: 3
+            mode: "(config-sec-zone-pair)#"
+        -
+            cmd: mpls ldp label
+            id: 212
+            up: 3
+            mode: "(config-ldp-lbl)#"
+        -
+            cmd: l3vpn encapsulation ip <R>.+
+            id: 213
+            up: 3
+            mode: "(config-l3vpn-encap-ip)#"
+        -
             cmd: router mobile
-            id: 36
+            id: 214
             up: 3
             mode: "(config-router)#"
         -
             cmd: router bgp <R>[0-9]+
-            id: 37
+            id: 215
             up: 3
             mode: "(config-router)#"
         -
             cmd: template peer-policy <R>.+
-            id: 38
-            up: 37
+            id: 216
+            up: 215
             mode: "(config-router-ptmp)#"
             exit-cmd: "exit-peer-policy"
         -
             cmd: template peer-session <R>.+
-            id: 39
-            up: 37
+            id: 217
+            up: 215
             mode: "(config-router-stmp)#"
             exit-cmd: "exit-peer-session"
         -
             cmd: address-family ipv4 <R>unicast|multicast|mdt|tunnel|labeled-unicast
-            id: 40
-            up: 37
+            id: 218
+            up: 215
             mode: "(config-router-af)#"
             exit-cmd: "exit-address-family"
         -
             cmd: address-family ipv6 <R>unicast|multicast
-            id: 41
-            up: 37
+            id: 219
+            up: 215
             mode: "(config-router-af)#"
             exit-cmd: "exit-address-family"
         -
-            cmd: address-family with-vrf ipv4 <R>unicast|multicast|mdt|tunnel|labeled-unicast vrf <R>.+
-            id: 42
-            up: 37
+            cmd: address-family ipv4 <R>unicast|multicast|mdt|tunnel|labeled-unicast vrf <R>.+
+            id: 220
+            up: 215
             mode: "(config-router-af)#"
             exit-cmd: "exit-address-family"
         -
-            cmd: address-family ipv6-with-vrf ipv6 <R>unicast|multicast vrf <R>.+
-            id: 43
-            up: 37
+            cmd: address-family ipv6 <R>unicast|multicast vrf <R>.+
+            id: 221
+            up: 215
             mode: "(config-router-af)#"
             exit-cmd: "exit-address-family"
         -
             cmd: address-family vpnv4 <R>unicast
-            id: 44
-            up: 37
+            id: 222
+            up: 215
             mode: "(config-router-af)#"
             exit-cmd: "exit-address-family"
         -
             cmd: address-family vpnv6 <R>unicast
-            id: 45
-            up: 37
+            id: 223
+            up: 215
             mode: "(config-router-af)#"
             exit-cmd: "exit-address-family"
         -
             cmd: address-family l2vpn <R>vpls
-            id: 46
-            up: 37
+            id: 224
+            up: 215
             mode: "(config-router-af)#"
             exit-cmd: "exit-address-family"
         -
             cmd: address-family nsap <R>unicast
-            id: 47
-            up: 37
+            id: 225
+            up: 215
             mode: "(config-router-af)#"
             exit-cmd: "exit-address-family"
         -
             cmd: address-family rtfilter <R>unicast
-            id: 48
-            up: 37
+            id: 226
+            up: 215
             mode: "(config-router-af)#"
             exit-cmd: "exit-address-family"
         -
             cmd: router eigrp <R>[0-9]+|.+
-            id: 49
+            id: 227
             up: 3
             mode: "(config-router)#"
         -
             cmd: router ospfv3 <R>[0-9]+
-            id: 50
+            id: 228
             up: 3
             mode: "(config-router)#"
         -
             cmd: address-family ipv4 unicast
-            id: 51
-            up: 50
+            id: 229
+            up: 228
             mode: "(config-router-af)#"
             exit-cmd: "exit-address-family"
         -
             cmd: address-family ipv6 unicast
-            id: 52
-            up: 50
+            id: 230
+            up: 228
             mode: "(config-router-af)#"
             exit-cmd: "exit-address-family"
         -
             cmd: router ospf <R>[0-9]+
-            id: 53
+            id: 231
             up: 3
             mode: "(config-router)#"
         -
             cmd: router isis
-            id: 54
+            id: 232
             up: 3
             mode: "(config-router)#"
         -
-            cmd: isis-main-container address-family ipv6 unicast
-            id: 55
-            up: 54
+            cmd: address-family ipv6 unicast
+            id: 233
+            up: 232
             mode: "(config-router-af)#"
             exit-cmd: "exit-address-family"
         -
-            cmd: router isis-container isis <R>.+
-            id: 56
+            cmd: router isis <R>.+
+            id: 234
             up: 3
             mode: "(config-router)#"
         -
-            cmd: isis-main-container address-family ipv6 unicast
-            id: 57
-            up: 56
+            cmd: address-family ipv6 unicast
+            id: 235
+            up: 234
             mode: "(config-router-af)#"
             exit-cmd: "exit-address-family"
         -
             cmd: router rip
-            id: 58
+            id: 236
             up: 3
             mode: "(config-router)#"
         -
             cmd: address-family ipv4 unicast
-            id: 59
-            up: 58
+            id: 237
+            up: 236
             mode: "(config-router-af)#"
             exit-cmd: "exit-address-family"
         -
             cmd: address-family ipv4 vrf <R>.+
-            id: 60
-            up: 58
+            id: 238
+            up: 236
             mode: "(config-router-af)#"
             exit-cmd: "exit-address-family"
         -
             cmd: router lisp
-            id: 61
+            id: 239
             up: 3
             mode: "(config-router-lisp)#"
         -
             cmd: locator-set <R>.+
-            id: 62
-            up: 61
+            id: 240
+            up: 239
             mode: "(config-router-lisp-locator-set)#"
         -
-            cmd: eid-table default-vrf <R>default
-            id: 63
-            up: 61
+            cmd: eid-table <R>default
+            id: 241
+            up: 239
             mode: "(config-router-lisp-eid-table)#"
         -
             cmd: eid-table vrf <R>.+
-            id: 64
-            up: 61
+            id: 242
+            up: 239
             mode: "(config-router-lisp-eid-table)#"
         -
             cmd: site <R>.+
-            id: 65
-            up: 61
+            id: 243
+            up: 239
             mode: "(config-router-lisp-site)#"
         -
-            cmd: router router-lisp lisp <R>[0-9]+
-            id: 66
+            cmd: router lisp <R>[0-9]+
+            id: 244
             up: 3
             mode: "(config-router-lisp)#"
         -
             cmd: locator-set <R>.+
-            id: 67
-            up: 66
+            id: 245
+            up: 244
             mode: "(config-router-lisp-locator-set)#"
         -
-            cmd: eid-table default-vrf <R>default
-            id: 68
-            up: 66
+            cmd: eid-table <R>default
+            id: 246
+            up: 244
             mode: "(config-router-lisp-eid-table)#"
         -
             cmd: eid-table vrf <R>.+
-            id: 69
-            up: 66
+            id: 247
+            up: 244
             mode: "(config-router-lisp-eid-table)#"
         -
             cmd: site <R>.+
-            id: 70
-            up: 66
+            id: 248
+            up: 244
             mode: "(config-router-lisp-site)#"
         -
             cmd: ipc zone default
-            id: 71
+            id: 249
             up: 3
             mode: "(config-ipczone)#"
         -
             cmd: trunk group <R>.+
-            id: 72
+            id: 250
             up: 3
             mode: "(config-trunk-group)#"
         -
             cmd: voice-card <R>[0-9]+
-            id: 73
+            id: 251
             up: 3
             mode: "(config-voicecard)#"
         -
             cmd: voice service voip
-            id: 74
+            id: 252
             up: 3
             mode: "(conf-voi-serv)#"
         -
             cmd: sip
-            id: 75
-            up: 74
+            id: 253
+            up: 252
             mode: "(conf-serv-sip)#"
         -
             cmd: voice translation-rule <R>[0-9]+
-            id: 76
+            id: 254
             up: 3
             mode: "(cfg-translation-rule)#"
         -
             cmd: voice translation-profile <R>.+
-            id: 77
+            id: 255
             up: 3
             mode: "(cfg-translation-profile)#"
         -
             cmd: event manager applet <R>.+
-            id: 78
+            id: 256
             up: 3
             mode: "(config-applet)#"
             exit-cmd: "exit"
         -
             cmd: trigger
-            id: 79
-            up: 78
+            id: 257
+            up: 256
             mode: "(config-applet-trigger)#"
         -
             cmd: transceiver type all
-            id: 80
+            id: 258
             up: 3
             mode: "(config-xcvr-type)#"
