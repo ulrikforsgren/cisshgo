@@ -21,6 +21,22 @@ def pyang_plugin_init():
 
 hid = 3
 
+def replace_in_regexp(s, f, r):
+  while (i:=s.find(f)) != -1:
+    lb = s.rfind(r'[', 0, i)
+    rb = s.rfind(r']', 0, i)
+    if lb<=rb:
+      s = s.replace(f, f'[{r}]', 1)
+    else:
+      s = s.replace(f, r, 1)
+  return s
+
+def replace_unicode_patterns(p):
+  if r'\p{N}' in p:
+    p = replace_in_regexp(p, r'\p{N}', r'0-9')
+  if r'\p{L}' in p:
+    p = replace_in_regexp(p, r'\p{L}', r'a-zA-Z')
+  return p
 
 class CisshgoPlugin(plugin.PyangPlugin):
     def add_output_format(self, fmts):
@@ -143,10 +159,6 @@ class CisshgoPlugin(plugin.PyangPlugin):
         if kp == 'string':
             if not p2:
                 return '.+'
-            for p in p2:
-              if '\\p' in p:
-                # TODO: Make XSD specific regexit Go/Python compaible
-                return "XSD-SPECIFIC-REGEXP"
             return '|'.join(p2)
         if kp[:4] == 'uint':
             return '[0-9]+'
@@ -175,7 +187,7 @@ class CisshgoPlugin(plugin.PyangPlugin):
         elif tst is types.LengthTypeSpec: # Strings with only a length restriction
             return (ts.name, '')
         elif tst is types.PatternTypeSpec: # Strings with patterns and optional length
-            return (ts.name, [ str(p) for p in ts.res ])
+            return (ts.name, [ replace_unicode_patterns(str(p)) for p in ts.res ])
         elif tst is types.EnumTypeSpec:
             return (ts.name, [e for e,_ in ts.enums])
         elif tst is types.UnionTypeSpec:
