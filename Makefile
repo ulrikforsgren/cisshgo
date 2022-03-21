@@ -1,4 +1,4 @@
-VER=0.1
+VER=0.2
 CONTAINER="containers.cisco.com/uforsgre/cisshgo"
 
 .PHONY: all
