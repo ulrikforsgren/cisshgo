@@ -13,6 +13,7 @@ image:
 	$(MAKE) cisshgo
 	docker build -t $(CONTAINER):$(VER) .
 
+.PHONY: push-image
 push-image:
 	docker push $(CONTAINER):$(VER)
 
