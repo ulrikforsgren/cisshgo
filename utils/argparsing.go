@@ -79,19 +79,28 @@ func ParseArgs() (*string, *string, int, *int, *Transcript) {
 		log.Fatalf("error: %v", err)
 	}
 
-    tMap := myTranscriptMap.Platforms[0][*platform]
-	//fmt.Printf("YAML Parsed Transcript Map:\n\n%+v\n", myTranscriptMap)
-    // Create context hierarchy
+    var transcript *Transcript = nil
+    platforms:
+	for k := range myTranscriptMap.Platforms {
+	    for l := range myTranscriptMap.Platforms[k] {
+            if l == *platform  {
+                tMap := myTranscriptMap.Platforms[k][l]
+                transcript = compileTranscript(*platform, &tMap)
+	            break platforms
+            }
+	    }
+	}
+
+    if transcript == nil {
+	    log.Fatalf("error: platform not found in transcript.")
+    }
+	return vendor, platform, numListeners, startingPortPtr, transcript
+}
+
+
+func compileTranscript(platform string, tMap *TranscriptMapPlatform) (*Transcript) {
     compiledSupportedCommands, _ := CompileCommands(tMap.CommandTranscripts)
     compiledContextSearch, contextHierarchy, _ := CompileMatches(tMap.ContextSearch)
-
-//    fmt.Println("============================================")
-//    fmt.Println("Hierarchy:")
-//    first := (*contextHierarchy)[1]
-//    iterateHierarchy(first, "")
-//    fmt.Println("============================================")
-
-
 
     transcript := Transcript{
 	                  Vendor:           tMap.Vendor,
@@ -102,9 +111,8 @@ func ParseArgs() (*string, *string, int, *int, *Transcript) {
                       ContextHierarchy: contextHierarchy,
                   }
 
-	return vendor, platform, numListeners, startingPortPtr, &transcript
+	return &transcript
 }
-
 
 func iterateHierarchy(node *ContextPattern, indent string) {
     fmt.Println(indent, node.Context.Id, node.Context.Mode)
