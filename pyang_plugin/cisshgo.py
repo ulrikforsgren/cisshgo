@@ -53,7 +53,8 @@ class CisshgoPlugin(plugin.PyangPlugin):
         """
         for epos, etag, eargs in ctx.errors:
             if error.is_error(error.err_level(etag)):
-                raise error.EmitError("CISSHGO plugin needs a valid module")
+                if etag != 'EXTENSION_ARGUMENT_PRESENT':
+                    raise error.EmitError("CISSHGO plugin needs a valid module")
         tree = {}
         mods = {}
         annots = {}
@@ -84,6 +85,7 @@ class CisshgoPlugin(plugin.PyangPlugin):
                 m, k = st.keyword
                 if m == "tailf-common":
                     if k == "cli-mode-name":
+                        # TODO: Default is to use container/list
                         cli_mode_name = st.arg
                     elif k == "cli-exit-command":
                         cli_exit_command = st.arg
@@ -95,9 +97,11 @@ class CisshgoPlugin(plugin.PyangPlugin):
         Other statements to_consider:
          - tailf:cli-suppress-mode
          - tailf:cli-add-mode
-         - 
+
+         - tailf:cli-flatten-container
+
         """
- 
+
         if node.keyword == 'container':
           assert(cli_allow_join_with_key == False)
           if not cli_drop_node_name:
@@ -190,6 +194,8 @@ class CisshgoPlugin(plugin.PyangPlugin):
             return (ts.name, [ replace_unicode_patterns(str(p)) for p in ts.res ])
         elif tst is types.EnumTypeSpec:
             return (ts.name, [e for e,_ in ts.enums])
+        elif tst is types.PathTypeSpec:
+            return (ts.name, '')
         elif tst is types.UnionTypeSpec:
             ta = []
             if t.i_typedef:
