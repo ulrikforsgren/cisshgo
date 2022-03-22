@@ -9,7 +9,6 @@ platforms:
         "show running-config": "transcripts/cisco/csr1000v/show_running-config.txt"
         "show version": "transcripts/cisco/csr1000v/show_version.txt"
         "terminal length <R>.*": "transcripts/empty.txt"
-        "terminal width <R>.*": "transcripts/empty.txt"
         "write mem": "transcripts/cisco/csr1000v/write_mem.txt"
         "!": "transcripts/empty.txt"
       context_search:
@@ -1337,7 +1336,6 @@ platforms:
         "show confd-state version": "transcripts/cisco/iosxr/show_confd-state_version.txt"
         "show confd-state loaded-data-models data-model tailf-ned-cisco-ios-xr": "transcripts/cisco/iosxr/show_confd-state_loaded-data-models_data-model_tailf-ned-cisco-ios-xr.txt"
         "terminal length 0": "transcripts/empty.txt"
-        "terminal width 0": "transcripts/empty.txt"
       context_search:
         -
             cmd: base
@@ -19165,7 +19163,6 @@ platforms:
         "show running-config": "transcripts/cisco/nx/show_running-config.txt"
         "show version": "transcripts/cisco/nx/show_version.txt"
         "terminal length 0": "transcripts/empty.txt"
-        "terminal width 511": "transcripts/empty.txt"
         "terminal length 0 ; terminal width 511 ; show version ; show inventory": "transcripts/cisco/nx/show_version_inventory.txt"
         "write mem": "transcripts/empty.txt"
       context_search:

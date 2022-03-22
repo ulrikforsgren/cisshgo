@@ -5,6 +5,7 @@ package handlers
 import (
 //    "fmt"
 	"log"
+    "regexp"
     "strconv"
 	"strings"
 
@@ -28,6 +29,8 @@ func GenericCiscoHandler(myFakeDevice *fakedevices.FakeDevice) {
 
 		// Setup a terminal with the hostname + initial context state as a prompt
 		term := terminal.NewTerminal(s, myFakeDevice.Hostname+ContextState.Context.Mode)
+
+        re_term_width := regexp.MustCompile(`^terminal +width +(\d+)\s*$`)
 
 		// Iterate over any user input that is provided at the terminal
 		for {
@@ -83,7 +86,20 @@ func GenericCiscoHandler(myFakeDevice *fakedevices.FakeDevice) {
 					myFakeDevice.Hostname + ContextState.Context.Mode,
 				))
 				continue 
-			}
+			} else if m := re_term_width.FindAllStringSubmatch(userInput, -1); m != nil {
+                width, err := strconv.ParseInt(m[0][1], 10, 0)
+                if err == nil {
+                    if width == 0 {
+                        width = 511 // Maximizing width
+                    }
+                    _, height := term.GetSize()
+		            log.Printf("New terminal width: %d\n", width)
+                    term.SetSize(int(width), height)
+                } else {
+                    term.Write(append([]byte("% Unknown command:  \""+userInput+"\""), '\n'))
+                }
+                continue
+            }
 
 			// Split user input into fields
 			userInputFields := strings.Fields(userInput)
