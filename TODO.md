@@ -17,9 +17,14 @@ Read transcript:
  - Simplify reading. Strange list/map
  - Search context [1] must always exits: Add checks
 
-Native commands:
- - Add support for terminal width command.
-
 Command parsing:
  - Cisco NX (at least) accepts semi-colon (;) separated commands:
    "terminal length 0 ; terminal width 511 ; show version ; show inventory"
+
+Modules:
+ - Change version of golang.org/x/term to unique local version to avoid
+   conflict.
+
+Wish list:
+ - Writable + compare config
+ - 
