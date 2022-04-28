@@ -10,5 +10,6 @@ FROM alpine as nx
 RUN mkdir /app
 COPY --from=build /app/cisshgo /app/cisshgo
 COPY /transcripts /app/transcripts
+COPY /id_rsa /app/.
 WORKDIR /app
 ENTRYPOINT ["/app/cisshgo"]

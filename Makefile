@@ -1,5 +1,5 @@
-VER=0.1
 CONTAINER="containers.cisco.com/uforsgre/cisshgo"
+VER=0.3
 
 .PHONY: all
 all: cisshgo
@@ -13,6 +13,7 @@ image:
 	$(MAKE) cisshgo
 	docker build -t $(CONTAINER):$(VER) .
 
+.PHONY: push-image
 push-image:
 	docker push $(CONTAINER):$(VER)
 

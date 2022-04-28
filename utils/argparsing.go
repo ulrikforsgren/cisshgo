@@ -1,12 +1,30 @@
 package utils
 
+/*
+ TODO:
+  - Separate reading config and creating structures to be use in the device.
+    - Read config
+    - Compile regexps and ceate hierarchy map
+    - Create hierarchical context list
+*/
+
 import (
 	"flag"
+    "fmt"
 	"io/ioutil"
 	"log"
 
 	"gopkg.in/yaml.v2"
 )
+
+type TranscriptMapContext struct {
+    Cmd                string        `yaml:"cmd" json:"cmd"`
+    Id                 uint          `yaml:"id" json:"id"`
+    Up                 uint          `yaml:"up" json:"up"`
+    Mode               string        `yaml:"mode" json:"mode"`
+    ExitCmd            string        `yaml:"exit-cmd" json:"exit-cmd"`
+    ExitTo             string        `yaml:"exit-to" json:"exit-to"`
+}
 
 // TranscriptMapPlatform struct for use inside of a TranscriptMap struct
 type TranscriptMapPlatform struct {
@@ -14,8 +32,7 @@ type TranscriptMapPlatform struct {
 	Hostname           string            `yaml:"hostname" json:"hostname"`
 	Password           string            `yaml:"password" json:"password"`
 	CommandTranscripts map[string]string `yaml:"command_transcripts" json:"command_transcripts"`
-	ContextSearch      map[string]string `yaml:"context_search" json:"context_search"`
-	ContextHierarchy   map[string]string `yaml:"context_hierarchy" json:"context_hierarchy"`
+	ContextSearch      []*TranscriptMapContext `yaml:"context_search" json:"context_search"`
 }
 
 // TranscriptMap Struct for modeling the TranscriptMap YAML
@@ -23,8 +40,17 @@ type TranscriptMap struct {
 	Platforms []map[string]TranscriptMapPlatform `yaml:"platforms" json:"platforms"`
 }
 
+type Transcript struct {
+	Vendor             string
+	Hostname           string
+	Password           string
+	CommandSearch      *MatchCommands
+	ContextSearch      *MatchContexts
+    ContextHierarchy   *ContextHierarchy
+}
+
 // ParseArgs parses command line arguments for cisshgo
-func ParseArgs() (*string, *string, int, *int, TranscriptMap) {
+func ParseArgs() (*string, *string, int, *int, *Transcript) {
 	// Gather command line arguments and parse them
 	vendor := flag.String("vendor", "cisco", "Device vendor")
 	platform := flag.String("platform", "csr1000v", "Device platform")
@@ -52,7 +78,45 @@ func ParseArgs() (*string, *string, int, *int, TranscriptMap) {
 	if err != nil {
 		log.Fatalf("error: %v", err)
 	}
-	// fmt.Printf("YAML Parsed Transcript Map:\n\n%+v\n", myTranscriptMap)
 
-	return vendor, platform, numListeners, startingPortPtr, myTranscriptMap
+    var transcript *Transcript = nil
+    platforms:
+	for k := range myTranscriptMap.Platforms {
+	    for l := range myTranscriptMap.Platforms[k] {
+            if l == *platform  {
+                tMap := myTranscriptMap.Platforms[k][l]
+                transcript = compileTranscript(*platform, &tMap)
+	            break platforms
+            }
+	    }
+	}
+
+    if transcript == nil {
+	    log.Fatalf("error: platform not found in transcript.")
+    }
+	return vendor, platform, numListeners, startingPortPtr, transcript
+}
+
+
+func compileTranscript(platform string, tMap *TranscriptMapPlatform) (*Transcript) {
+    compiledSupportedCommands, _ := CompileCommands(tMap.CommandTranscripts)
+    compiledContextSearch, contextHierarchy, _ := CompileMatches(tMap.ContextSearch)
+
+    transcript := Transcript{
+	                  Vendor:           tMap.Vendor,
+	                  Hostname:         tMap.Hostname,
+	                  Password:         tMap.Password,
+	                  CommandSearch:    compiledSupportedCommands,
+	                  ContextSearch:    compiledContextSearch,
+                      ContextHierarchy: contextHierarchy,
+                  }
+
+	return &transcript
+}
+
+func iterateHierarchy(node *ContextPattern, indent string) {
+    fmt.Println(indent, node.Context.Id, node.Context.Mode)
+    for _, n := range node.Commands {
+        iterateHierarchy(n, indent+"    ")
+    }
 }

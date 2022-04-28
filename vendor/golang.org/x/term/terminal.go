@@ -826,6 +826,12 @@ func (t *Terminal) clearAndRepaintLinePlusNPrevious(numPrevLines int) {
 	t.moveCursorToPos(t.pos)
 }
 
+func (t *Terminal) GetSize() (int, int) {
+	t.lock.Lock()
+	defer t.lock.Unlock()
+    return t.termWidth, t.termHeight
+}
+
 func (t *Terminal) SetSize(width, height int) error {
 	t.lock.Lock()
 	defer t.lock.Unlock()
