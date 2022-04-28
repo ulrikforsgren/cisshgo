@@ -6,9 +6,15 @@ import (
 	"strings"
 )
 
+type CommandFile struct {
+    Name string
+    PerDeviceData bool
+    CmdData map[int]string
+}
+
 type CommandPattern struct {
     Pattern []interface{}
-    File string
+    File CommandFile
 }
 
 type MatchCommands []*CommandPattern
@@ -26,7 +32,8 @@ func CompileCommands(supportedCommands map[string]string) (*MatchCommands, error
                 comp_fields[n] = f
             }
         }
-        fieldsMap = append(fieldsMap, &CommandPattern{Pattern: comp_fields, File: file})
+        fieldsMap = append(fieldsMap, &CommandPattern{Pattern: comp_fields,
+                           File: CommandFile{Name: file}})
 	}
 
     return &fieldsMap, nil
@@ -134,11 +141,11 @@ func CompileCommands(supportedCommands map[string]string) (*MatchCommands, error
 //	match: bool
 // 	matchedCommand: string
 //	error
-func CommandMatch(userInput string, supportedCommands *MatchCommands) (bool, string, bool, error) {
+func CommandMatch(userInput string, supportedCommands *MatchCommands) (bool, *CommandFile, bool, error) {
 
 	// Setup our return variables
 	match := false
-    var matchedCommand string
+    var matchedCommand *CommandFile
 
 	// Turn our input string into fields
 	// fmt.Printf("userInput: %s\n", userInput)
@@ -173,7 +180,7 @@ func CommandMatch(userInput string, supportedCommands *MatchCommands) (bool, str
                 }
             }
             if match {
-                matchedCommand = file
+                matchedCommand = &file
                 break
             }
         }

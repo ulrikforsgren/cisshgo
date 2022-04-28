@@ -4,6 +4,8 @@ import (
     "fmt"
 	"io/ioutil"
 	"log"
+    "strconv"
+    "strings"
 
 	"github.com/tbotnz/cisshgo/utils"
 )
@@ -21,6 +23,7 @@ type FakeDevice struct {
 	CommandSearch     *utils.MatchCommands // What commands this fake device supports
 	ContextSearch     *utils.MatchContexts // The available CLI prompt/contexts on this fake device
 	ContextHierarchy  *utils.ContextHierarchy // The hierarchy of the available contexts
+    StartingPort      int
 }
 
 // readFile abstracts the standard error handling of opening and reading a file into a string
@@ -37,12 +40,26 @@ func InitGeneric(
 	vendor string,
 	platform string,
 	transcript *utils.Transcript,
+    numListeners int,
+    startingPort int,
 ) *FakeDevice {
 
 	// Iterate through the command transcripts and read their contents into our supported commands
 	for _, v := range *transcript.CommandSearch {
-        fmt.Println(v.File)
-		v.File = readFile(v.File)
+        //fmt.Println(v.File)
+        if strings.Contains(v.File.Name, "<PORT>") {
+            v.File.PerDeviceData = true
+		    v.File.CmdData = map[int]string {}
+            for i:=0; i<numListeners; i++ {
+                var name = strings.ReplaceAll(v.File.Name, "<PORT>",strconv.Itoa(startingPort+i))
+                fmt.Println(name)
+		        v.File.CmdData[i] = readFile(name)
+            }
+        } else {
+            v.File.PerDeviceData = false
+		    v.File.CmdData = map[int]string {}
+		    v.File.CmdData[0] = readFile(v.File.Name)
+        }
 	}
 
 
@@ -56,6 +73,7 @@ func InitGeneric(
 		CommandSearch:     transcript.CommandSearch,
 		ContextSearch:     transcript.ContextSearch,
 		ContextHierarchy:  transcript.ContextHierarchy,
+        StartingPort:      startingPort,
 	}
 
 	//fmt.Printf("\n%+v\n", myFakeDevice)
