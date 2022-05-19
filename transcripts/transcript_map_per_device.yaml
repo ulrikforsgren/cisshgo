@@ -1330,7 +1330,7 @@ platforms:
       hostname: "cisshgoiosxr"
       password: "admin"
       command_transcripts:
-        "show running-config": "transcripts/cisco/iosxr/show_running-config.txt"
+        "show running-config": "transcripts/cisco/iosxr/show_running-config-<PORT>.txt"
         "show version": "transcripts/cisco/iosxr/show_version_brief.txt"
         "show version brief": "transcripts/cisco/iosxr/show_version_brief.txt"
         "show confd-state version": "transcripts/cisco/iosxr/show_confd-state_version.txt"
@@ -19160,7 +19160,7 @@ platforms:
       hostname: "cisshgonx"
       password: "admin"
       command_transcripts:
-        "show running-config": "transcripts/cisco/nx/show_running-config.txt"
+        "show running-config": "transcripts/cisco/nx/show_running-config-<PORT>.txt"
         "show version": "transcripts/cisco/nx/show_version.txt"
         "terminal length 0": "transcripts/empty.txt"
         "terminal length 0 ; terminal width 511 ; show version ; show inventory": "transcripts/cisco/nx/show_version_inventory.txt"
@@ -19612,3 +19612,23 @@ platforms:
             id: 89
             up: 3
             mode: "(config-sync-sp)#"
+  - xos:
+      vendor: "extreme"
+      hostname: "extreme-xos"
+      password: "admin"
+      command_transcripts:
+        "show version": "transcripts/extreme/xos/show_version.txt"
+        "show configuration": "transcripts/extreme/xos/show_configuration-<PORT>.txt"
+        "disable clipaging": "transcripts/empty.txt"
+        "show configuration detail | inc \"configure account\"": "transcripts/empty.txt"
+      context_search:
+        -
+            cmd: base
+            id: 1
+            up: 0
+            mode: "# "
+        -
+            cmd: config terminal
+            id: 2
+            up: 1
+            mode: "(config)# "

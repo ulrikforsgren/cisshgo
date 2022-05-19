@@ -19612,3 +19612,23 @@ platforms:
             id: 89
             up: 3
             mode: "(config-sync-sp)#"
+  - xos:
+      vendor: "extreme"
+      hostname: "extreme-xos"
+      password: "admin"
+      command_transcripts:
+        "show version": "transcripts/extreme/xos/show_version.txt"
+        "show configuration": "transcripts/extreme/xos/show_configuration-empty.txt"
+        "disable clipaging": "transcripts/empty.txt"
+        "show configuration detail | inc \"configure account\"": "transcripts/empty.txt"
+      context_search:
+        -
+            cmd: base
+            id: 1
+            up: 0
+            mode: "# "
+        -
+            cmd: config terminal
+            id: 2
+            up: 1
+            mode: "(config)# "
