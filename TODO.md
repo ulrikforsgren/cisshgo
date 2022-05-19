@@ -9,6 +9,11 @@ transcript:
 options:
  - Debug/Trace
 
+bad code:
+ - Fix variables for numListeners and startintPort
+   numListeners is actually upper port number.
+   Do not return pointer to int.
+
 Debug/Trace:
  - Function to log timestamp, node + arb. text.
 
