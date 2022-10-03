@@ -18,10 +18,9 @@ import (
 )
 
 // GenericCiscoHandler function handles generic Cisco style sessions
-func GenericCiscoHandler(myFakeDevice *fakedevices.FakeDevice) {
+func GenericCiscoHandler(myFakeDevice *fakedevices.FakeDevice, s ssh.Session) {
 
 	// Prepare the "ssh.DefaultHandler", this houses our device specific functionality
-	ssh.Handle(func(s ssh.Session) {
 
 		log.Printf("%s: terminal connected\n", s.LocalAddr())
 		var Port = uint(s.LocalAddr().(*net.TCPAddr).Port)
@@ -154,5 +153,4 @@ func GenericCiscoHandler(myFakeDevice *fakedevices.FakeDevice) {
 		}
 		log.Printf("%s: terminal closed\n", s.LocalAddr())
 
-	})
 }

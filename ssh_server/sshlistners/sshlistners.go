@@ -22,7 +22,6 @@ func GenericListener(
 
 	// Prepare an SSH Handler for our fake device.
 	// This will allow for per-device-type handling/features
-	myHandler(myFakeDevice)
 
 	portString := ":" + strconv.Itoa(portNumber)
 	log.Printf("Starting cissh.go ssh server on port %s\n", portString)
@@ -31,7 +30,9 @@ func GenericListener(
 		// Actually kick off the SSH server and listen on the given port
 		ssh.ListenAndServe(
 			portString, // Address string in the form of "ip:port"
-			nil,        // ssh.Handler (we're using the DefaultHandler assigned above)
+			func(s ssh.Session) {
+                myHandler(myFakeDevice, s)
+            },
 			ssh.PasswordAuth(
 				func(ctx ssh.Context, pass string) bool {
 					return pass == myFakeDevice.Password
