@@ -9,6 +9,7 @@ import (
     "regexp"
     "strconv"
 	"strings"
+    "time"
 
 	"github.com/gliderlabs/ssh"
 	"golang.org/x/crypto/ssh/terminal"
@@ -117,16 +118,19 @@ func GenericCiscoHandler(myFakeDevice *fakedevices.FakeDevice, s ssh.Session) {
 			// Run userInput through the command matcher to look at supportedCommands
 			//match, matchedCommand, multipleMatches, err := utils.CmdMatch(userInput, myFakeDevice.SupportedCommands)
 			match, matchedCommand, multipleMatches, err := utils.CommandMatch(userInput, myFakeDevice.CommandSearch)
-			if err != nil {
-				log.Println(err)
-				break
-			}
 
 			if match && !multipleMatches {
                 index := 0
                 if matchedCommand.PerDeviceData {
                     index =int(Port)-myFakeDevice.StartingPort
                 }
+
+                if userInput == "write memory" {
+                    d_s := 5000
+                    log.Printf("Delay: %d\n", d_s)
+                    time.Sleep(time.Duration(d_s) * time.Millisecond)
+                }
+
 				// Render the matched command output
 				output, err := fakedevices.TranscriptReader(
 					matchedCommand.CmdData[index],
@@ -137,7 +141,18 @@ func GenericCiscoHandler(myFakeDevice *fakedevices.FakeDevice, s ssh.Session) {
 				}
 
 				// Write the output of our matched command
-				term.Write(append([]byte(output), '\n'))
+                data_len := len(output)
+                p := 0
+                for p<data_len {
+                    endp := p + 250
+                    if endp>=data_len {
+                        endp = data_len
+                    }
+				    term.Write([]byte(output[p:endp]))
+                    time.Sleep(time.Duration(10) * time.Millisecond)
+                    p = endp
+                }
+				term.Write([]byte("\n"))
 				continue
 			} else if multipleMatches {
 				// Multiple commands were matched, throw ambiguous command
