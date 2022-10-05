@@ -10,6 +10,7 @@ platforms:
         "show version": "transcripts/cisco/csr1000v/show_version.txt"
         "terminal length <R>.*": "transcripts/empty.txt"
         "write mem": "transcripts/cisco/csr1000v/write_mem.txt"
+        "write memory": "transcripts/cisco/csr1000v/write_mem.txt"
         "!": "transcripts/empty.txt"
       context_search:
         -
