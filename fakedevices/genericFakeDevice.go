@@ -15,6 +15,7 @@ import (
 
 // FakeDevice Struct for the device we will be simulating
 type FakeDevice struct {
+    Args              *utils.CmdlineArguments
 	Vendor            string            // Vendor of this fake device
 	Platform          string            // Platform of this fake device
 	Hostname          string            // Hostname of the fake device
@@ -37,6 +38,7 @@ func readFile(filename string) string {
 
 // InitGeneric builds a FakeDevice struct for use with cisshgo
 func InitGeneric(
+    args *utils.CmdlineArguments,
 	vendor string,
 	platform string,
 	transcript *utils.Transcript,
@@ -65,6 +67,7 @@ func InitGeneric(
 
 	// Create our fake device and return it
 	myFakeDevice := FakeDevice{
+        Args:              args,
 		Vendor:            transcript.Vendor,
 		Platform:          "Undefined", // Currently not used...
 		Hostname:          transcript.Hostname,

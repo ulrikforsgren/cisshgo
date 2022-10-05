@@ -126,7 +126,7 @@ func GenericCiscoHandler(myFakeDevice *fakedevices.FakeDevice, s ssh.Session) {
                 }
 
                 if userInput == "write memory" {
-                    d_s := 5000
+                    d_s := myFakeDevice.Args.Delay
                     log.Printf("Delay: %d\n", d_s)
                     time.Sleep(time.Duration(d_s) * time.Millisecond)
                 }
