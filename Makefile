@@ -4,8 +4,6 @@ VER=0.3
 .PHONY: all
 all: cisshgo
 
-.PHONY: all
-all: image
 
 .PHONY: image
 image:

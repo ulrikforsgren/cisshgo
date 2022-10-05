@@ -10,23 +10,26 @@ import (
 func main() {
 
 	// Parse the command line arguments
-	vendor, platform, numListeners, startingPortPtr, transcript := utils.ParseArgs()
+	args, transcript := utils.ParseArgs()
 
-	// Initialize our fake device
-	myFakeDevice := fakedevices.InitGeneric(
-		*vendor,          // Vendor
-		*platform,        // Platform
-		transcript,       // Transcript map with locations of command output to play back
-	)
 
 	// Make a Channel named "done" for handling Goroutines, which expects a bool as return value
 	done := make(chan bool, 1)
 
 	// Iterate through the server ports and spawn a Goroutine for each
-	for portNumber := *startingPortPtr; portNumber < numListeners; portNumber++ {
+	for index := 0; index < args.Listeners; index++ {
+        // Initialize our fake device
+        aFakeDevice := fakedevices.InitGeneric(
+            args,
+            *args.Vendor,          // Vendor
+            *args.Platform,        // Platform
+            transcript,       // Transcript map with locations of command output to play back
+            args.Listeners,
+            args.StartingPort,
+        )
 		// Today this is just spawning a generic listener.
 		// In the future, this is where we could split out listeners/handlers by device type.
-		go sshlistners.GenericListener(myFakeDevice, portNumber, handlers.GenericCiscoHandler, done)
+		go sshlistners.GenericListener(aFakeDevice, args.StartingPort+index, handlers.GenericCiscoHandler, done)
 	}
 
 	// Receive all the values from the channel (essentially wait on it to be empty)

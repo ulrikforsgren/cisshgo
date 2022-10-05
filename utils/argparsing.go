@@ -49,22 +49,36 @@ type Transcript struct {
     ContextHierarchy   *ContextHierarchy
 }
 
+type CmdlineArguments struct {
+    Vendor             *string
+    Platform           *string
+    Listeners          int
+    StartingPort       int
+    Delay              int
+}
+
+
 // ParseArgs parses command line arguments for cisshgo
-func ParseArgs() (*string, *string, int, *int, *Transcript) {
+func ParseArgs() (*CmdlineArguments, *Transcript) {
 	// Gather command line arguments and parse them
 	vendor := flag.String("vendor", "cisco", "Device vendor")
 	platform := flag.String("platform", "csr1000v", "Device platform")
 	listenersPtr := flag.Int("listeners", 50, "How many listeners do you wish to spawn?")
 	startingPortPtr := flag.Int("startingPort", 10000, "What port do you want to start at?")
+	delay := flag.Int("delay", 0, "Delay in milliseconds for the 'write memory' cli command")
 	transcriptMapPtr := flag.String(
 		"transcriptMap",
 		"transcripts/transcript_map.yaml",
 		"What file contains the map of commands to transcribed output?",
 	)
 	flag.Parse()
-
-	// How many total listeners will we have?
-	numListeners := *startingPortPtr + *listenersPtr
+    args := CmdlineArguments {
+        vendor,
+        platform,
+        *listenersPtr,
+        *startingPortPtr,
+        *delay,
+    }
 
 	// Gather the command transcripts and create a map of vendor/platform/command
 	transcriptMapRaw, err := ioutil.ReadFile(*transcriptMapPtr)
@@ -94,7 +108,7 @@ func ParseArgs() (*string, *string, int, *int, *Transcript) {
     if transcript == nil {
 	    log.Fatalf("error: platform not found in transcript.")
     }
-	return vendor, platform, numListeners, startingPortPtr, transcript
+	return &args, transcript
 }
 
 

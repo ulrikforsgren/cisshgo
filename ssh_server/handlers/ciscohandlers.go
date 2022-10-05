@@ -5,9 +5,11 @@ package handlers
 import (
 //    "fmt"
 	"log"
+    "net"
     "regexp"
     "strconv"
 	"strings"
+    "time"
 
 	"github.com/gliderlabs/ssh"
 	"golang.org/x/crypto/ssh/terminal"
@@ -17,12 +19,12 @@ import (
 )
 
 // GenericCiscoHandler function handles generic Cisco style sessions
-func GenericCiscoHandler(myFakeDevice *fakedevices.FakeDevice) {
+func GenericCiscoHandler(myFakeDevice *fakedevices.FakeDevice, s ssh.Session) {
 
 	// Prepare the "ssh.DefaultHandler", this houses our device specific functionality
-	ssh.Handle(func(s ssh.Session) {
 
 		log.Printf("%s: terminal connected\n", s.LocalAddr())
+		var Port = uint(s.LocalAddr().(*net.TCPAddr).Port)
 
 		// Setup our initial "context" or prompt
 		ContextState := (*myFakeDevice.ContextHierarchy)[1] // base
@@ -116,15 +118,22 @@ func GenericCiscoHandler(myFakeDevice *fakedevices.FakeDevice) {
 			// Run userInput through the command matcher to look at supportedCommands
 			//match, matchedCommand, multipleMatches, err := utils.CmdMatch(userInput, myFakeDevice.SupportedCommands)
 			match, matchedCommand, multipleMatches, err := utils.CommandMatch(userInput, myFakeDevice.CommandSearch)
-			if err != nil {
-				log.Println(err)
-				break
-			}
 
 			if match && !multipleMatches {
+                index := 0
+                if matchedCommand.PerDeviceData {
+                    index =int(Port)-myFakeDevice.StartingPort
+                }
+
+                if userInput == "write memory" {
+                    d_s := myFakeDevice.Args.Delay
+                    log.Printf("Delay: %d\n", d_s)
+                    time.Sleep(time.Duration(d_s) * time.Millisecond)
+                }
+
 				// Render the matched command output
 				output, err := fakedevices.TranscriptReader(
-					matchedCommand,
+					matchedCommand.CmdData[index],
 					myFakeDevice,
 				)
 				if err != nil {
@@ -132,7 +141,18 @@ func GenericCiscoHandler(myFakeDevice *fakedevices.FakeDevice) {
 				}
 
 				// Write the output of our matched command
-				term.Write(append([]byte(output), '\n'))
+                data_len := len(output)
+                p := 0
+                for p<data_len {
+                    endp := p + 250
+                    if endp>=data_len {
+                        endp = data_len
+                    }
+				    term.Write([]byte(output[p:endp]))
+                    time.Sleep(time.Duration(10) * time.Millisecond)
+                    p = endp
+                }
+				term.Write([]byte("\n"))
 				continue
 			} else if multipleMatches {
 				// Multiple commands were matched, throw ambiguous command
@@ -148,5 +168,4 @@ func GenericCiscoHandler(myFakeDevice *fakedevices.FakeDevice) {
 		}
 		log.Printf("%s: terminal closed\n", s.LocalAddr())
 
-	})
 }

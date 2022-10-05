@@ -1,0 +1,10 @@
+no service password-encryption
+no cable admission-control preempt priority-voice
+no cable qos permission create
+no cable qos permission update
+no cable qos permission modems
+ip source-route
+no ip cef
+no ip forward-protocol nd
+no ipv6 cef
+no dot11 syslog
