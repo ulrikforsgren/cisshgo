@@ -19,7 +19,7 @@ import (
 )
 
 // GenericCiscoHandler function handles generic Cisco style sessions
-func GenericCiscoHandler(myFakeDevice *fakedevices.FakeDevice, s ssh.Session) {
+func GenericCiscoHandler(args *utils.CmdlineArguments, myFakeDevice *fakedevices.FakeDevice, s ssh.Session) {
 
 	// Prepare the "ssh.DefaultHandler", this houses our device specific functionality
 

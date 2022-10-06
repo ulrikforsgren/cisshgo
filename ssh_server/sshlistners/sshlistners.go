@@ -10,10 +10,12 @@ import (
 
 	"github.com/tbotnz/cisshgo/fakedevices"
 	"github.com/tbotnz/cisshgo/ssh_server/handlers"
+	"github.com/tbotnz/cisshgo/utils"
 )
 
 // GenericListener function that creates a fake device and terminal session
 func GenericListener(
+    args *utils.CmdlineArguments,
 	myFakeDevice *fakedevices.FakeDevice,
 	portNumber int,
 	myHandler handlers.PlatformHandler,
@@ -31,7 +33,7 @@ func GenericListener(
 		ssh.ListenAndServe(
 			portString, // Address string in the form of "ip:port"
 			func(s ssh.Session) {
-                myHandler(myFakeDevice, s)
+                myHandler(args, myFakeDevice, s)
             },
 			ssh.PasswordAuth(
 				func(ctx ssh.Context, pass string) bool {

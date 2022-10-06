@@ -55,6 +55,7 @@ type CmdlineArguments struct {
     Listeners          int
     StartingPort       int
     Delay              int
+    Silent             bool
 }
 
 
@@ -66,6 +67,7 @@ func ParseArgs() (*CmdlineArguments, *Transcript) {
 	listenersPtr := flag.Int("listeners", 50, "How many listeners do you wish to spawn?")
 	startingPortPtr := flag.Int("startingPort", 10000, "What port do you want to start at?")
 	delay := flag.Int("delay", 0, "Delay in milliseconds for the 'write memory' cli command")
+	silent := flag.Bool("s", false, "Run in silent mode")
 	transcriptMapPtr := flag.String(
 		"transcriptMap",
 		"transcripts/transcript_map.yaml",
@@ -78,6 +80,7 @@ func ParseArgs() (*CmdlineArguments, *Transcript) {
         *listenersPtr,
         *startingPortPtr,
         *delay,
+        *silent,
     }
 
 	// Gather the command transcripts and create a map of vendor/platform/command
