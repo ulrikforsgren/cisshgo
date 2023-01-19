@@ -5,7 +5,7 @@ package handlers
 import (
 //    "fmt"
 	"log"
-    "net"
+//    "net"
     "regexp"
     "strconv"
 	"strings"
@@ -24,7 +24,7 @@ func GenericCiscoHandler(args *utils.CmdlineArguments, myFakeDevice *fakedevices
 	// Prepare the "ssh.DefaultHandler", this houses our device specific functionality
 
 		log.Printf("%s: terminal connected\n", s.LocalAddr())
-		var Port = uint(s.LocalAddr().(*net.TCPAddr).Port)
+//		var Port = uint(s.LocalAddr().(*net.TCPAddr).Port)
 
 		// Setup our initial "context" or prompt
 		ContextState := (*myFakeDevice.ContextHierarchy)[1] // base
@@ -122,7 +122,7 @@ func GenericCiscoHandler(args *utils.CmdlineArguments, myFakeDevice *fakedevices
 			if match && !multipleMatches {
                 index := 0
                 if matchedCommand.PerDeviceData {
-                    index =int(Port)-myFakeDevice.StartingPort
+                    index = myFakeDevice.Port
                 }
 
                 if userInput == "write memory" {

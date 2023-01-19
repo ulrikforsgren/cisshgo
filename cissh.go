@@ -31,10 +31,11 @@ func main() {
             transcript,       // Transcript map with locations of command output to play back
             args.Listeners,
             args.StartingPort,
+            args.StartingPort+index, // Port
         )
 		// Today this is just spawning a generic listener.
 		// In the future, this is where we could split out listeners/handlers by device type.
-		go sshlistners.GenericListener(args, aFakeDevice, args.StartingPort+index, handlers.GenericCiscoHandler, done)
+		go sshlistners.GenericListener(args, aFakeDevice, handlers.GenericCiscoHandler, done)
 	}
 
 	// Receive all the values from the channel (essentially wait on it to be empty)

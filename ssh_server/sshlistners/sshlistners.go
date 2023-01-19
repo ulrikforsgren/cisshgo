@@ -17,7 +17,6 @@ import (
 func GenericListener(
     args *utils.CmdlineArguments,
 	myFakeDevice *fakedevices.FakeDevice,
-	portNumber int,
 	myHandler handlers.PlatformHandler,
 	done chan bool,
 ) {
@@ -25,7 +24,7 @@ func GenericListener(
 	// Prepare an SSH Handler for our fake device.
 	// This will allow for per-device-type handling/features
 
-	portString := ":" + strconv.Itoa(portNumber)
+	portString := ":" + strconv.Itoa(myFakeDevice.Port)
 	log.Printf("Starting cissh.go ssh server on port %s\n", portString)
 
 	log.Fatal(
