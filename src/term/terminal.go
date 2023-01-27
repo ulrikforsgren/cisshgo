@@ -117,6 +117,7 @@ const (
 	keyCtrlD     = 4
 	keyCtrlU     = 21
 	keyEnter     = '\r'
+	keyNewline   = '\n'
 	keyEscape    = 27
 	keyBackspace = 127
 	keyUnknown   = 0xd800 /* UTF-16 surrogate area */ + iota
@@ -451,7 +452,7 @@ func visualLength(runes []rune) int {
 // handleKey processes the given key and, optionally, returns a line of text
 // that the user has entered.
 func (t *Terminal) handleKey(key rune) (line string, ok bool) {
-	if t.pasteActive && key != keyEnter {
+	if t.pasteActive && key != keyEnter && key != keyNewline {
 		t.addKeyToLine(key)
 		return
 	}
@@ -521,7 +522,7 @@ func (t *Terminal) handleKey(key rune) (line string, ok bool) {
 				t.setLine(runes, len(runes))
 			}
 		}
-	case keyEnter:
+	case keyEnter, keyNewline:
 		t.moveCursorToPos(len(t.line))
 		t.queue([]rune("\r\n"))
 		line = string(t.line)
@@ -829,7 +830,7 @@ func (t *Terminal) clearAndRepaintLinePlusNPrevious(numPrevLines int) {
 func (t *Terminal) GetSize() (int, int) {
 	t.lock.Lock()
 	defer t.lock.Unlock()
-    return t.termWidth, t.termHeight
+	return t.termWidth, t.termHeight
 }
 
 func (t *Terminal) SetSize(width, height int) error {
