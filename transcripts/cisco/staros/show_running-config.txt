@@ -1,0 +1,62 @@
+license key test-netsim-license
+require diameter-proxy single
+plugin 1
+exit
+context test
+ ip igmp profile default
+ exit
+ ip access-list ecs
+  permit any
+  redirect css service ecs any
+ exit
+ interface test
+  ip address 1.1.1.1 255.255.252.0
+ exit
+ gtpp group default
+ exit
+ aaa group default
+ exit
+ apn test.com
+  dns primary 1.1.1.1
+  ip source-violation ignore
+  ip access-group ecs in
+  ip access-group ecs out
+  ip address pool name test_pool
+ exit
+ subscriber default
+ exit
+exit
+context local
+ ip route 0.0.0.0 0.0.0.0 1.1.1.1 LOCAL1
+ ip route 0.0.0.0 0.0.0.0 1.1.1.2 LOCAL1
+ interface LOCAL1
+  ip address 2.2.2.2 255.255.255.0
+ exit
+ gtpp group default
+ exit
+ administrator starosadmin encrypted password ftp
+ administrator tailf encrypted password ftp
+ aaa group default
+ exit
+ server sshd
+  subsystem sftp
+ exit
+ subscriber default
+ exit
+exit
+port ethernet 1/1
+ no shutdown
+ bind interface LOCAL1 local
+exit
+port ethernet 1/10
+ no shutdown
+exit
+port ethernet 1/11
+ no shutdown
+ bind interface test test
+exit
+ntp
+ enable
+exit
+no snmp notif-threshold
+no boot config overwrite

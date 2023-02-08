@@ -19633,3 +19633,33 @@ platforms:
             id: 2
             up: 1
             mode: "(config)# "
+  - staros:
+      vendor: "cisco"
+      hostname: "staros"
+      password: "admin"
+      command_transcripts:
+        "no timestamps": "transcripts/empty.txt"
+        "autoconfirm": "transcripts/empty.txt"
+        "terminal width <R>.*": "transcripts/empty.txt"
+        "terminal length <R>.*": "transcripts/empty.txt"
+        "show version": "transcripts/cisco/staros/show_version.txt"
+        "show boot": "transcripts/cisco/staros/show_boot.txt"
+        "show plugin": "transcripts/cisco/staros/show_plugin.txt"
+        "show running-config": "transcripts/cisco/staros/show_running-config.txt"
+      context_search:
+        -
+            cmd: base
+            id: 1
+            up: 0
+            mode: "%"
+        -
+            cmd: enable
+            id: 2
+            up: 1
+            mode: "#"
+            exit-to: 0
+        -
+            cmd: config terminal
+            id: 3
+            up: 2
+            mode: "(config)#"

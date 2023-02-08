@@ -1,0 +1,1 @@
+boot system priority 9 image /flash/production.60511.qvpc-di.bin config /flash/system.cfg
