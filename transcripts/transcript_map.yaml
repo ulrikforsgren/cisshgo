@@ -19653,13 +19653,7 @@ platforms:
             up: 0
             mode: "%"
         -
-            cmd: enable
+            cmd: config
             id: 2
             up: 1
-            mode: "#"
-            exit-to: 0
-        -
-            cmd: config terminal
-            id: 3
-            up: 2
-            mode: "(config)#"
+            mode: "(config)%"
