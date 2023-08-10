@@ -11,5 +11,6 @@ RUN mkdir /app
 COPY --from=build /app/cisshgo /app/cisshgo
 COPY /transcripts /app/transcripts
 COPY /id_rsa /app/.
+COPY /start.sh /app/.
 WORKDIR /app
-ENTRYPOINT ["/app/cisshgo"]
+ENTRYPOINT ["/app/start.sh"]
